@@ -9,8 +9,10 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-
-            '@': path.resolve(__dirname, 'src'), // ✅ 추가
+            '@': path.resolve(__dirname, 'src'),
         },
+    },
+    build: {
+        outDir: 'build', // ✅ 이 부분 추가
     },
 });
