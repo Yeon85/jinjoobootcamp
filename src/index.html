@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript 기본 예제</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+    h1 {
+      color: #333;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    .output {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>JavaScript 기본 예제</h1>
+
+  <!-- 1. 알림창 띄우기 -->
+  1-1.변수 <button onclick="showAlert()">알림 띄우기</button><br/>
+  1-2.변수<div>
+    <input type="text" id="nameInput" placeholder="이름을 입력하세요">
+    <button onclick="printName()">이름 출력</button>
+  </div>
+  <div class="output" id="outputArea"></div>
+
+  2.함수 <input type="number" id="num1" placeholder="첫 번째 숫자">
+  <input type="number" id="num2" placeholder="두 번째 숫자">
+  <button onclick="handleAdd()">더하기</button>
+  <input type="number" id="result" placeholder="더해진값"><br/>
+  
+
+  <!-- 2. 입력값 받아서 출력하기 -->
+  
+
+  <!-- 3. 조건문 예제 -->
+  3.조건문 <button onclick="checkAge()">나이 조건문 예제</button><br/>
+
+  <!-- 4. 반복문 예제 -->
+  4.반복문 <button onclick="repeatMessage()">반복문 예제</button> <br/>
+
+  <h2>ArrayList 버튼 테스트</h2>
+
+  <input type="text" id="itemInput" placeholder="아이템 입력" />
+  <button onclick="addItem()">추가</button>
+  <button onclick="removeLast()">마지막 삭제</button>
+  <button onclick="showList()">리스트 보기</button>
+
+  <div id="list">[ ]</div>
+
+
+  <script>
+    //1-1.변수
+    var hi = "안녕하세요! JavaScript 연습 중입니다.";
+    function showAlert() {
+      alert(hi);
+    }
+    
+    //1-2.변수
+    function printName() {
+      const name = document.getElementById("nameInput").value;
+      document.getElementById("outputArea").innerText = `입력한 이름: ${name}`;
+    }
+
+
+    //2.함수
+    function add(x, y) {
+      let temp = x + y;
+      return temp;
+    }
+
+    function handleAdd() {
+
+      let x = parseFloat(document.getElementById('num1').value);
+      let y = parseFloat(document.getElementById('num2').value);
+
+      let sum = add(x, y);
+
+      document.getElementById('result').value = sum;
+    }
+
+    
+
+   //3. 조건문
+    function checkAge() {
+      const age = prompt("나이를 입력하세요:");
+      if (age >= 20) {
+        alert("성인입니다!");
+      } else {
+        alert("미성년자입니다.");
+      }
+    }
+
+    //4.반복문
+    function repeatMessage() {
+      for (let i = 1; i <= 5; i++) {
+        console.log(`반복 ${i}: Hello JavaScript!`);
+      }
+      alert("반복문 완료! 콘솔을 확인하세요.");
+    }
+
+
+    // 5. ArrayList 리스트 생성
+     let arrayList = [];
+
+    // 아이템 추가 PUSH()
+    function addItem() {
+    const input = document.getElementById('itemInput');
+    const value = input.value.trim();
+    if (value) {
+        arrayList.push(value);
+        input.value = ''; // 입력창 비우기
+        showList();
+    } else {
+        alert('아이템을 입력해 주세요!');
+    }
+    }
+
+    // 마지막 아이템 삭제  POP()
+    function removeLast() {
+    if (arrayList.length > 0) {
+        arrayList.pop();
+        showList();
+    } else {
+        alert('삭제할 아이템이 없습니다.');
+    }
+    }
+
+    // 리스트 보여주기
+    function showList() {
+    const listDiv = document.getElementById('list');
+    listDiv.textContent = JSON.stringify(arrayList);
+    }
+  </script>
+
+</body>
+</html>

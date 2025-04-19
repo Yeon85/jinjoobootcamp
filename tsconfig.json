@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+      "target": "esnext",
+      "useDefineForClassFields": true,
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": false,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "module": "esnext",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "jsx": "react-jsx",
+      
+      "baseUrl": "./",                     // ✅ 추가
+      "paths": {                           // ✅ 추가
+        "@/*": ["src/*"]
+      }
+    },
+    "include": ["src"],
+    "references": [{ "path": "./tsconfig.node.json" }]
+  }
+  

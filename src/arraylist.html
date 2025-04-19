@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>ArrayList 버튼 테스트 (Enter 추가)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    button { margin: 5px; padding: 10px 15px; }
+    #list { margin-top: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+
+  <h2>ArrayList 버튼 테스트</h2>
+
+  <input type="text" id="itemInput" placeholder="아이템 입력" />
+  <button onclick="addItem()">추가</button>
+  <button onclick="removeLast()">마지막 삭제</button>
+  <button onclick="showList()">리스트 보기</button>
+
+  <div id="list">[ ]</div>
+
+  <script>
+    // 리스트 생성
+    let arrayList = [];
+
+    // 아이템 추가 함수
+    function addItem() {
+      const input = document.getElementById('itemInput');
+      const value = input.value.trim();
+      if (value) {
+        arrayList.push(value);
+        input.value = ''; // 입력창 비우기
+        showList();
+      } else {
+        alert('아이템을 입력해 주세요!');
+      }
+    }
+
+    // 마지막 아이템 삭제 함수
+    function removeLast() {
+      if (arrayList.length > 0) {
+        arrayList.pop();
+        showList();
+      } else {
+        alert('삭제할 아이템이 없습니다.');
+      }
+    }
+
+    // 리스트 보여주기 함수
+    function showList() {
+      const listDiv = document.getElementById('list');
+      listDiv.textContent = JSON.stringify(arrayList);
+    }
+
+    // 👉 Enter 키 눌렀을 때 addItem() 호출
+    const inputBox = document.getElementById('itemInput');
+    inputBox.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        addItem();
+      }
+    });
+  </script>
+
+</body>
+</html>
