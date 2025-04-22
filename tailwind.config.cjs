@@ -60,7 +60,61 @@ module.exports = {
                     DEFAULT: '#ffffff',
                     light: '#e0e6ed',
                     dark: '#888ea8',
-                },
+                },front: {
+                    DEFAULT: '#d946ef', // bg-fuchsia-500
+                    light: '#fce7f3',   // 밝은 fuchsia-200 근처
+                    dark: '#a21caf',    // 진한 fuchsia-700 근처
+                  },
+                  database: {
+                    DEFAULT: '#a855f7', // bg-purple-500
+                    light: '#ede9fe',   // 밝은 purple-200
+                    dark: '#6b21a8',    // 진한 purple-700
+                  },
+                  server: {
+                    DEFAULT: '#3b82f6', // bg-blue-500
+                    light: '#dbeafe',   // 밝은 blue-200
+                    dark: '#1d4ed8',    // 진한 blue-700
+                  },
+                  cloud: {
+                    DEFAULT: '#ef4444', // bg-red-500
+                    light: '#fee2e2',   // 밝은 red-200
+                    dark: '#b91c1c',    // 진한 red-700
+                  },
+                  interview: {
+                    DEFAULT: '#fb923c', // bg-orange-400
+                    light: '#ffedd5',   // 밝은 orange-100
+                    dark: '#ea580c',    // 진한 orange-700
+                  },
+                  career: {
+                    DEFAULT: '#fbbf24', // bg-amber-400
+                    light: '#fef3c7',   // 밝은 amber-100
+                    dark: '#b45309',    // 진한 amber-700
+                  },
+                  project2d: {
+                    DEFAULT: '#a3e635', // bg-lime-400
+                    light: '#ecfccb',   // 밝은 lime-100
+                    dark: '#65a30d',    // 진한 lime-700
+                  },
+                  project3d: {
+                    DEFAULT: '#4ade80', // bg-green-400
+                    light: '#dcfce7',   // 밝은 green-100
+                    dark: '#15803d',    // 진한 green-700
+                  },
+                  graduation: {
+                    DEFAULT: '#22d3ee', // bg-cyan-400
+                    light: '#cffafe',   // 밝은 cyan-100
+                    dark: '#0e7490',    // 진한 cyan-700
+                  },
+                  ot: {
+                    DEFAULT: '#f43f5e', // bg-rose-500
+                    light: '#ffe4e6',   // 밝은 rose-100
+                    dark: '#be123c',    // 진한 rose-700
+                  },
+                  emp: {
+                    DEFAULT: '#8b5cf6', // bg-violet-500
+                    light: '#ede9fe',   // 밝은 violet-200
+                    dark: '#6d28d9',    // 진한 violet-700
+                  },
             },
             fontFamily: {
                 nunito: ['Nunito', 'sans-serif'],

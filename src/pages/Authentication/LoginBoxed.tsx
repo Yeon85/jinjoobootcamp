@@ -15,15 +15,22 @@ import IconGoogle from '../../components/Icon/IconGoogle';
 import { loginUser } from '../../store/userSlice';
 
 import axios from 'axios'; // 위에 추가
+import ApplicationConfig from '../../application';
 
 const LoginBoxed = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const API_URL = ApplicationConfig.API_URL;
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Login Boxed'));
+        // ✅ 최초 세팅: 한국어(ko)로 강제 변경
+        i18next.changeLanguage('ko');
+        dispatch(toggleRTL('ltr'));
+        setFlag('ko');
+
     });
     const navigate = useNavigate();
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -44,7 +51,7 @@ const LoginBoxed = () => {
         e.preventDefault();
         let response;
         try {
-            response = await axios.post('http://localhost:5000/api/login', {
+            response = await axios.post(`${API_URL}/api/login`, {
                 email,
                 password,
             });
@@ -60,19 +67,20 @@ const LoginBoxed = () => {
                 name: response.data.user.name,
                 email: response.data.user.email,
                 profileImage: response.data.user.profileImage,  // 혹시 없으면 profileImage는 생략해도 됨
+                role_code:response.data.user.role_code,
             }));
     
             // ✅ 추가정보 입력 여부 확인하고 이동
-            if (response.data.user.extraCompleted) {
+            if (response.data.user.user_extra) {
                 navigate('/'); // 메인으로
             } else {
                 navigate('/survey'); // 추가정보 작성페이지로
             }
         } catch (error: any) {
             if (error.response) {
-                alert("에러메세지" + error.response.data); // 에러 메시지 표시
+                alert("에러메세지 ||" + error.response.data); // 에러 메시지 표시
             } else {
-                alert('로그인 중 오류 발생');
+                alert('로그인 중 오류 발생2');
             }
         }
     };
@@ -177,7 +185,7 @@ const LoginBoxed = () => {
                                     </label>
                                 </div>
                                 <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    로그인
+                                    로그인1212
                                 </button>
                             </form>
                             <div className="relative my-7 text-center md:mb-9">

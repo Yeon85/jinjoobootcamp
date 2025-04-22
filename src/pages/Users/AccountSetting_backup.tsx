@@ -5,7 +5,7 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import { IRootState } from '../../store';
 import axios from 'axios';
 import { updateUser } from '@/store/userSlice';
-import ApplicationConfig from '../../application';
+
 
 const AccountSetting = () => {
 
@@ -32,16 +32,16 @@ const AccountSetting = () => {
     const [inputGithub, setInputGithub] = useState(user.github_url || '');
     const [updatedProfileImagePath, setUpdatedProfileImagePath] = useState(user.profileImage || '');
 
-    const API_URL = ApplicationConfig.API_URL;	
+
     const [formData, setFormData] = useState({
         id:user.id,
-        userId:'',
-        name: '',
-        job_title: '',
+        userId:user.id,
+        name: user.name || '',
+        job_title: user.job_title,
         birthday: '',
         location: '',
-        phone: '',
-        email: '',
+        phone: user.phone || '',
+        email: user.email || '',
         twitter_url: '',
         dribbble_url: '',
         github_url: '',
@@ -55,7 +55,7 @@ const AccountSetting = () => {
 
     const fetchUserDetails = async () => {
         try {
-            const response = await axios.get(`${API_URL}/api/user/${user.id}`);
+            const response = await axios.get(`http://localhost:5000/api/user/${user.id}`);
             console.log('유저 상세 가져오기 성공', response.data);
             setFormData(prev => ({ ...prev, ...response.data.user })); // ✅ .user 붙여야 함
         } catch (error) {
@@ -82,13 +82,18 @@ const AccountSetting = () => {
         form.append('userId', String(user.id));  // user.id를 문자로 변환해서 같이 보내!
 
         try {
-            const res = await axios.post(`${API_URL}/api/upload-profile`, form, {
+            const res = await axios.post('http://localhost:5000/api/upload-profile', form, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             const filePath = res.data.filePath;
 
-            //alert(filePath);
+            // await axios.put(`http://localhost:5000/api/user/profile-image`, {
+            //     id: user.id,
+            //     profile_image: filePath
+            // });
+
+            alert(filePath);
           
             // ✅ 여기!! Redux에 바로 저장
         dispatch(updateUser({ profileImage: filePath }));
@@ -110,8 +115,8 @@ const handleSave = async () => {
     try {
      
     console.log("formData",formData);
-      await axios.put(`${API_URL}/api/user`, {...formData
-        //id: user.id,
+      await axios.put('http://localhost:5000/api/user', {...formData,
+        id: user.id,
       });  
       // Redux에도 업데이트
       dispatch(updateUser({ profileImage: updatedProfileImagePath }));
@@ -127,7 +132,7 @@ const handleSave = async () => {
         <div className="p-6">
             <div className="flex flex-col items-center">
                 <img
-                    src={previewImage || `${API_URL}${user.profileImage}` || '/assets/images/profile-34.jpeg'}
+                    src={previewImage || `http://localhost:5000${user.profileImage}` || '/assets/images/profile-34.jpeg'}
                     alt="Profile"
                     className="w-32 h-32 rounded-full object-cover mb-4"
                 />

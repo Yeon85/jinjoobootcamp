@@ -369,10 +369,10 @@ const Faq = () => {
                 </div>
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
                     <button type="button" className="btn btn-primary">
-                        Contact Us
+                    문의하기
                     </button>
                     <button type="button" className="btn btn-primary">
-                        Visit our community
+                    우리 커뮤니티를 방문해보세요
                     </button>
                 </div>
             </div>

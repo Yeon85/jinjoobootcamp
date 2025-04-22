@@ -11,6 +11,7 @@ import './tailwind.css';
 // i18n (needs to be bundled)
 import './i18n';
 
+import './assets/globals.css';
 // Router
 import { RouterProvider } from 'react-router-dom';
 import router from './router/index';

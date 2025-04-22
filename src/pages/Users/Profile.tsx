@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import { useEffect } from 'react';
+
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
 import IconCoffee from '../../components/Icon/IconCoffee';
 import IconCalendar from '../../components/Icon/IconCalendar';
@@ -18,13 +18,57 @@ import IconTag from '../../components/Icon/IconTag';
 import IconCreditCard from '../../components/Icon/IconCreditCard';
 import IconClock from '../../components/Icon/IconClock';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
+import { loginUser } from '@/store/userSlice';
+import axios from 'axios';
+import { useState,useEffect } from 'react';
+import ApplicationConfig from '../../application';
 
 const Profile = () => {
     const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Profile'));
+    const API_URL = ApplicationConfig.API_URL;
+    const user = useSelector((state: IRootState) => state.user);
+    const [formData, setFormData] = useState({
+        id:user.id,
+        userId:user.id,
+        profileImage: user.profileImage,
+        name: '',
+        job_title: '',
+        birthday: '',
+        location: '',
+        phone: '',
+        email: '',
+        twitter_url: '',
+        dribbble_url: '',
+        github_url: '',
     });
+   
+
+    useEffect(() => {
+        if (user.id) {
+            fetchUserDetails();
+        }
+    }, [user.id]);
+
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+
+    console.log(user); // ✅ Redux user 확인하기
+
+
+    const fetchUserDetails = async () => {
+    if (!user?.id) {
+        console.error('유저 ID가 없습니다.');
+        return;
+    }
+
+    try {
+        const response = await axios.get(`http://localhost:5000/api/user/${user.id}`);
+        console.log('유저 정보 가져오기 성공', response.data);
+        setFormData((prev) => ({ ...prev, ...response.data.user }));
+    } catch (error) {
+        console.error('유저 정보 가져오기 실패', error);
+    }
+    };
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -48,32 +92,32 @@ const Profile = () => {
                         </div>
                         <div className="mb-5">
                             <div className="flex flex-col justify-center items-center">
-                                <img src="/assets/images/profile-34.jpeg" alt="img" className="w-24 h-24 rounded-full object-cover  mb-5" />
-                                <p className="font-semibold text-primary text-xl">Jimmy Turner</p>
+                                <img src={`${API_URL}${formData.profileImage}`} alt="img" className="w-24 h-24 rounded-full object-cover  mb-5" />
+                                <p className="font-semibold text-primary text-xl">{formData.name}</p>
                             </div>
                             <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
                                 <li className="flex items-center gap-2">
                                     <IconCoffee className="shrink-0" />
-                                    Web Developer
+                                    {formData.job_title}
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconCalendar className="shrink-0" />
-                                    Jan 20, 1989
+                                   {formData.birthday}
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconMapPin className="shrink-0" />
-                                    New York, USA
+                                    {formData.location}
                                 </li>
                                 <li>
                                     <button className="flex items-center gap-2">
                                         <IconMail className="w-5 h-5 shrink-0" />
-                                        <span className="text-primary truncate">jimmy@gmail.com</span>
+                                        <span className="text-primary truncate">{user.email}</span>
                                     </button>
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconPhone />
                                     <span className="whitespace-nowrap" dir="ltr">
-                                        +1 (530) 555-12121
+                                    {formData.phone}
                                     </span>
                                 </li>
                             </ul>

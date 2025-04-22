@@ -92,8 +92,9 @@ const ContactUsBoxed = () => {
                         </div>
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
-                                <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Contact us</h1>
+                                <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Contact us(문의하기)</h1>
                                 <p className="text-base font-bold leading-normal text-white-dark">Submit your queries and we will get back to you as soon as possible.</p>
+                                <p className="text-base font-bold leading-normal text-white-dark">문의 사항을 남겨주시면 최대한 빨리 답변해 드리겠습니다.</p>
                             </div>
                             <form className="space-y-5" onSubmit={submitForm}>
                                 <div className="relative text-white-dark">
@@ -127,7 +128,7 @@ const ContactUsBoxed = () => {
                                     </span>
                                 </div>
                                 <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    Submit
+                                    제출하기
                                 </button>
                             </form>
                         </div>

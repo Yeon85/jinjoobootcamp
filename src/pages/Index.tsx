@@ -748,7 +748,7 @@ const Index = () => {
                                 <div className="flex">
                                     <span className="shrink-0 grid place-content-center text-base w-9 h-9 rounded-md bg-success-light dark:bg-success text-success dark:text-success-light">SP</span>
                                     <div className="px-3 flex-1">
-                                        <div>Shaun Park</div>
+                                        <div>Shaun Park1234</div>
                                         <div className="text-xs text-white-dark dark:text-gray-500">10 Jan 1:00PM</div>
                                     </div>
                                     <span className="text-success text-base px-1 ltr:ml-auto rtl:mr-auto whitespace-pre">+$36.11</span>

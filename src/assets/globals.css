@@ -1,0 +1,161 @@
+
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+}
+
+.fc-event.frontenddev {
+    background-color: #6366f1; /* 파랑 */
+    border: none;
+  }
+  
+  .fc-event.Database {
+    background-color: #60a5fa; /* 연한 파랑 */
+    border: none;
+  }
+  
+  .fc-event.Server {
+    background-color: #34d399; /* 초록 */
+    border: none;
+  }
+  
+  .fc-event.Cloud {
+    background-color: #f87171; /* 빨강 */
+    border: none;
+  }
+  
+  /* 기타 카테고리 추가로 만들어주기 */
+    .fc-event.DevOps {
+        background-color: #fbbf24; /* 노랑 */
+        border: none;
+    }  
+
+    .fc-event.frontend {
+      background-color: #6366f1 !important; /* 파랑 */
+      border: none !important;
+    }
+    .fc-event.database {
+      background-color: #60a5fa !important; /* 연한 파랑 */
+      border: none !important;
+    }
+    .fc-event.server {
+      background-color: #34d399 !important; /* 초록 */
+      border: none !important;
+    }
+    .fc-event.cloud {
+      background-color: #f87171 !important; /* 빨강 */
+      border: none !important;
+    }
+    .fc-event.employment {
+      background-color: #facc15 !important; /* 노랑 */
+      border: none !important;
+    }
+    .fc-event.interview {
+      background-color: #fb923c !important; /* 주황 */
+      border: none !important;
+    }
+    .fc-event.career {
+      background-color: #38bdf8 !important; /* 하늘 */
+      border: none !important;
+    }
+    .fc-event.project2d {
+      background-color: #10b981 !important; /* 청록 */
+      border: none !important;
+    }
+    .fc-event.project3d {
+      background-color: #8b5cf6 !important; /* 보라 */
+      border: none !important;
+    }
+    .fc-event.ot {
+      background-color: #ec4899 !important; /* 핑크 */
+      border: none !important;
+    }
+    .fc-event.graduation {
+      background-color: #f43f5e !important; /* 진한 핑크 */
+      border: none !important;
+    }
+    
+/* 
+    📋 지금 올린 색상 정리
+
+클래스명	색상(hex)	느낌	Tailwind 기본 색상 이름 기준
+.employment	#facc15	노랑	yellow-400
+.interview	#fb923c	주황	orange-400
+.career	#38bdf8	하늘색	sky-400
+.project2d	#10b981	청록	emerald-500
+.project3d	#8b5cf6	보라색	violet-500
+.ot	#ec4899	핑크색	pink-500
+.graduation	#f43f5e	진한 핑크	rose-500
+✅ Tailwind CSS 컬러 매칭
+
+원하는 색 느낌	Tailwind 색상 클래스
+노랑 (#facc15)	bg-yellow-400
+주황 (#fb923c)	bg-orange-400
+하늘 (#38bdf8)	bg-sky-400
+청록 (#10b981)	bg-emerald-500
+보라 (#8b5cf6)	bg-violet-500
+핑크 (#ec4899)	bg-pink-500
+진한 핑크 (#f43f5e)	bg-rose-500
+✅ Tailwind 색 이름까지 완전 정확히 매칭된다.
+
+🚀 만약 Tailwind로 이 색 쓰고 싶으면
+HTML 클래스에서 이렇게 쓰면 돼:
+
+html
+복사
+편집
+<div class="h-2.5 w-2.5 rounded-sm bg-yellow-400"></div> <!-- employment -->
+<div class="h-2.5 w-2.5 rounded-sm bg-orange-400"></div> <!-- interview -->
+<div class="h-2.5 w-2.5 rounded-sm bg-sky-400"></div>     <!-- career -->
+<div class="h-2.5 w-2.5 rounded-sm bg-emerald-500"></div> <!-- project2d -->
+<div class="h-2.5 w-2.5 rounded-sm bg-violet-500"></div>  <!-- project3d -->
+<div class="h-2.5 w-2.5 rounded-sm bg-pink-500"></div>    <!-- ot -->
+<div class="h-2.5 w-2.5 rounded-sm bg-rose-500"></div>    <!-- graduation -->
+
+ */
+
+
+    .fc-event.primary {
+      background-color: #6366f1 !important; /* Work */
+      border: none !important;
+    }
+    .fc-event.info {
+      background-color: #38bdf8 !important; /* Travel */
+      border: none !important;
+    }
+    .fc-event.success {
+      background-color: #22c55e !important; /* Personal */
+      border: none !important;
+    }
+    .fc-event.danger {
+      background-color: #fb7185 !important; /* Important */
+      border: none !important;
+    }
+    .fc-event.warning {
+      background-color: #facc15 !important; /* Front */
+      border: none !important;
+    }
+    .fc-event.purple {
+      background-color: #a855f7 !important; /* Cloud */
+      border: none !important;
+    }
+    .fc-event.cyan {
+      background-color: #22d3ee !important; /* Database */
+      border: none !important;
+    }
+    .fc-event.orange {
+      background-color: #fb923c !important; /* Server */
+      border: none !important;
+    }
+    .fc-event.lime {
+      background-color: #84cc16 !important; /* Employment */
+      border: none !important;
+    }
+    .fc-event.teal {
+      background-color: #14b8a6 !important; /* Project2D */
+      border: none !important;
+    }
+    .fc-event.pink {
+      background-color: #f472b6 !important; /* Project3D */
+      border: none !important;
+    }
+    

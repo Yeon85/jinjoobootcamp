@@ -103,7 +103,7 @@ const UnlockCover = () => {
                                     <img src="/assets/images/auth/user.png" className="w-full object-cover" alt="images" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-2xl dark:text-white">Shaun Park</h4>
+                                    <h4 className="text-2xl dark:text-white">Shaun Park가나다라</h4>
                                     <p className="text-white-dark">Enter your password to unlock your ID</p>
                                 </div>
                             </div>

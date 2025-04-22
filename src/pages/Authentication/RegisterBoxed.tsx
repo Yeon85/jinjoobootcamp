@@ -17,9 +17,10 @@ import IconGoogle from '../../components/Icon/IconGoogle';
 //추가
 import axios from 'axios'; 
 import { loginUser } from '../../store/userSlice'; // ✅ loginUser 액션 가져오기
-
+import ApplicationConfig from '../../application';
 
 const RegisterBoxed = () => {
+
     const [name, setName] = useState('');
     const [userId, setUserId] = useState('');
     const [email, setEmail] = useState('');
@@ -43,33 +44,40 @@ const RegisterBoxed = () => {
     };
     const [flag, setFlag] = useState(themeConfig.locale);
 
-    // const submitForm = () => {
-    //     navigate('/');
-    // };
+    const API_URL = ApplicationConfig.API_URL;
+    console.log("API_URL:",API_URL);
 
     const submitForm = async (e: React.FormEvent) => {
         console.log("e: React.FormEvent:",e);
         e.preventDefault();
         let response;
         try {
-            response = await axios.post('http://localhost:5000/api/register', {
+           
+            response = await axios.post(`${API_URL}/api/register`, { 
                 userId,
                 name,
                 email,
                 password,
             });
             const userData = response;  // ✅ 여기 수정
-            console.log("userData:",userData);
-            dispatch(loginUser(userData));
-           // alert(response.data); // 로그인 성공 메시지
-// 2. 알림
-alert('회원가입 성공 및 자동 로그인 완료!');
-            navigate('/'); // 홈으로 이동
+            console.log("!!!!!userData:",userData.data.user);
+            dispatch(loginUser(userData.data.user));
+         
+            // 2. 알림
+            alert('🚀환영합니다.');
+         
+
+            if (response.data.user.user_extra) {
+                navigate('/'); // 메인으로
+            } else {
+                navigate('/survey'); // 추가정보 작성페이지로
+            }
+
         } catch (error: any) {
             if (error.response) {
                 alert(error.response.data); // 에러 메시지 표시
             } else {
-                alert('로그인 중 오류 발생');
+                alert('로그인 중 오류 발생!');
             }
         }
     };
@@ -213,7 +221,7 @@ alert('회원가입 성공 및 자동 로그인 완료!');
                                     </label>
                                 </div>
                                 <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    회원 가입 1
+                                    회원 가입1
                                 </button>
                             </form>
                             <div className="relative my-7 text-center md:mb-9">

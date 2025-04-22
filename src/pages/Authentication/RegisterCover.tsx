@@ -15,15 +15,14 @@ import IconTwitter from '../../components/Icon/IconTwitter';
 import IconGoogle from '../../components/Icon/IconGoogle';
 
 import axios from 'axios'; // 위에 추가
-
-
-
+import ApplicationConfig from '../../application';
 
 const RegisterCover = () => {
     const [name, setName] = useState('');
     const [userId, setUserId] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const API_URL = ApplicationConfig.API_URL;	
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -42,16 +41,12 @@ const RegisterCover = () => {
     };
     const [flag, setFlag] = useState(themeConfig.locale);
 
-    // const submitForm = () => {
-    //     navigate('/');
-    // };
-
     const submitForm = async (e: React.FormEvent) => {
         console.log("e: React.FormEvent:",e);
         e.preventDefault();
     
         try {
-            const response = await axios.post('http://localhost:5000/api/register', {
+            const response = await axios.post(`${VITE_URL}/api/register`, {
                 userId,
                 name,
                 email,

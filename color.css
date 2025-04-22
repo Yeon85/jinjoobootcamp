@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tailwind 색상 확인</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-10 bg-gray-100">
+
+  <div class="grid grid-cols-4 gap-4">
+    <!-- 노랑 -->
+    <div class="bg-yellow-400 text-white font-bold p-6 rounded">yellow-400<br>#facc15</div>
+    <!-- 주황 -->
+    <div class="bg-orange-400 text-white font-bold p-6 rounded">orange-400<br>#fb923c</div>
+    <!-- 하늘 -->
+    <div class="bg-sky-400 text-white font-bold p-6 rounded">sky-400<br>#38bdf8</div>
+    <!-- 청록 -->
+    <div class="bg-emerald-500 text-white font-bold p-6 rounded">emerald-500<br>#10b981</div>
+
+    <!-- 보라 -->
+    <div class="bg-violet-500 text-white font-bold p-6 rounded">violet-500<br>#8b5cf6</div>
+    <!-- 핑크 -->
+    <div class="bg-pink-500 text-white font-bold p-6 rounded">pink-500<br>#ec4899</div>
+    <!-- 진한 핑크 -->
+    <div class="bg-rose-500 text-white font-bold p-6 rounded">rose-500<br>#f43f5e</div>
+    <!-- 빨강 -->
+    <div class="bg-red-400 text-white font-bold p-6 rounded">red-400<br>#f87171</div>
+
+    <!-- 파랑 -->
+    <div class="bg-blue-400 text-white font-bold p-6 rounded">blue-400<br>#60a5fa</div>
+    <!-- 연두 -->
+    <div class="bg-green-400 text-white font-bold p-6 rounded">green-400<br>#34d399</div>
+    <!-- 민트 -->
+    <div class="bg-teal-400 text-white font-bold p-6 rounded">teal-400<br>#2dd4bf</div>
+    <!-- 인디고 -->
+    <div class="bg-indigo-400 text-white font-bold p-6 rounded">indigo-400<br>#818cf8</div>
+
+    <!-- 연보라 -->
+    <div class="bg-purple-400 text-white font-bold p-6 rounded">purple-400<br>#c084fc</div>
+    <!-- 라임 -->
+    <div class="bg-lime-500 text-white font-bold p-6 rounded">lime-500<br>#84cc16</div>
+    <!-- 진한 노랑 -->
+    <div class="bg-amber-500 text-white font-bold p-6 rounded">amber-500<br>#f59e0b</div>
+    <!-- 밝은 청록 -->
+    <div class="bg-cyan-400 text-white font-bold p-6 rounded">cyan-400<br>#22d3ee</div>
+
+    <!-- 선명한 분홍 -->
+    <div class="bg-fuchsia-400 text-white font-bold p-6 rounded">fuchsia-400<br>#e879f9</div>
+    <!-- 돌색 -->
+    <div class="bg-stone-400 text-black font-bold p-6 rounded">stone-400<br>#a8a29e</div>
+    <!-- 중간회색 -->
+    <div class="bg-neutral-400 text-black font-bold p-6 rounded">neutral-400<br>#a3a3a3</div>
+    <!-- 차가운 회색 -->
+    <div class="bg-zinc-400 text-black font-bold p-6 rounded">zinc-400<br>#a1a1aa</div>
+
+    <!-- 청회색 -->
+    <div class="bg-slate-400 text-black font-bold p-6 rounded">slate-400<br>#94a3b8</div>
+  </div>
+
+
+  <body class="p-10 bg-gray-100">
+
+  <h2 class="text-2xl font-bold mb-4">🎀 파스텔 핑크 계열</h2>
+  <div class="grid grid-cols-4 gap-4 mb-10">
+    <div class="bg-pink-200 text-black font-bold p-6 rounded">pink-200<br>#fbcfe8</div>
+    <div class="bg-rose-200 text-black font-bold p-6 rounded">rose-200<br>#fecdd3</div>
+    <div class="bg-fuchsia-200 text-black font-bold p-6 rounded">fuchsia-200<br>#f5d0fe</div>
+    <div class="bg-violet-200 text-black font-bold p-6 rounded">violet-200<br>#ddd6fe</div>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-4">🌟 형광 핑크 계열</h2>
+  <div class="grid grid-cols-4 gap-4">
+    <div class="bg-fuchsia-500 text-white font-bold p-6 rounded">fuchsia-500<br>#d946ef</div>
+    <div class="bg-fuchsia-600 text-white font-bold p-6 rounded">fuchsia-600<br>#c026d3</div>
+    <div class="bg-rose-500 text-white font-bold p-6 rounded">rose-500<br>#f43f5e</div>
+    <div class="bg-pink-500 text-white font-bold p-6 rounded">pink-500<br>#ec4899</div>
+  </div>
+</body>
+</html>

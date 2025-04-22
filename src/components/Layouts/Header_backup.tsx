@@ -505,6 +505,9 @@ const Header = () => {
                         </button>
                         <ul className="sub-menu">
                             <li>
+                                <NavLink to="/survey">{t('survey')}</NavLink>
+                            </li>
+                            <li>
                                 <NavLink to="/apps/chat">{t('chat')}</NavLink>
                             </li>
                             <li>

@@ -165,9 +165,8 @@ const Calendar = () => {
     };
 
     // ✨ 새로운 함수
-    const user = useSelector((state: IRootState) => state.user); // ✅ Redux user 가져오기
-    const role = useSelector((state) => user.role_code);
     const roleCheck = () => {
+        const user = useSelector((state: IRootState) => state.user); // ✅ Redux user 가져오기
         console.log(user?.role_code);   
         if (user?.role_code !== 'admin') {
             showMessage('Only admin users can create or edit events.', 'error');

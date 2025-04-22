@@ -10,6 +10,10 @@ import IconLockDots from '../../components/Icon/IconLockDots';
 
 const UnlockBox = () => {
     const dispatch = useDispatch();
+    const [submitType, setSubmitType] = useState<'unlock' | 'login'>('login'); // 🔥 여기!
+    const user = useSelector((state: IRootState) => state.user); // ✅ Redux user 가져오기
+    const name = user.name;
+
     useEffect(() => {
         dispatch(setPageTitle('Unlock Box'));
     });
@@ -17,12 +21,16 @@ const UnlockBox = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const setLocale = (flag: string) => {
+
         setFlag(flag);
         if (flag.toLowerCase() === 'ae') {
             dispatch(toggleRTL('rtl'));
         } else {
             dispatch(toggleRTL('ltr'));
         }
+        alert(themeConfig.locale);
+
+        //언어 변경 하기 
     };
     const [flag, setFlag] = useState(themeConfig.locale);
 
@@ -90,7 +98,7 @@ const UnlockBox = () => {
                                     <img src="/assets/images/auth/user.png" className="w-full object-cover" alt="images" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-2xl dark:text-white">Shaun Park</h4>
+                                    <h4 className="text-2xl dark:text-white">{name}</h4>
                                     <p className="text-white-dark">Enter your password to unlock your ID</p>
                                 </div>
                             </div>
@@ -106,8 +114,14 @@ const UnlockBox = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    UNLOCK
+                                <button type="submit" onClick={() => setSubmitType('unlock')} className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                    잠금해제
+                                </button>
+                                <button type="submit" onClick={() => setSubmitType('unlock')} className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                        프로필
+                                </button>
+                                <button type="submit" onClick={() => setSubmitType('logout')} className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                    로그아웃
                                 </button>
                             </form>
                         </div>

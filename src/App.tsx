@@ -12,6 +12,7 @@ import {
   toggleSemidark,
 } from './store/themeConfigSlice';
 
+
 function App({ children }: PropsWithChildren) {
   const themeConfig = useSelector((state: IRootState) => state.themeConfig);
   const dispatch = useDispatch();

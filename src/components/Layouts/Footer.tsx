@@ -1,5 +1,5 @@
 const Footer = () => {
-    return <div className="dark:text-white-dark text-center ltr:sm:text-left rtl:sm:text-right p-6 pt-0 mt-auto">© {new Date().getFullYear()}.정연주 컴퍼니</div>;
+    return <div className="dark:text-white-dark text-center ltr:sm:text-align-center rtl:sm:text-right p-6 pt-0 mt-auto">© {new Date().getFullYear()}-오앤오피 진주부트캠프</div>;
 };
 
 export default Footer;
