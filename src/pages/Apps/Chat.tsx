@@ -242,8 +242,6 @@ const Chat = () => {
                             <IconPhone className="mx-auto mb-1" />
                             Calls
                         </button>
-
-
                         <button type="button" className="hover:text-primary">
                             <IconUserPlus className="mx-auto mb-1" />
                             Contacts
