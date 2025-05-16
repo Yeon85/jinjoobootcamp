@@ -60,10 +60,21 @@
         @apply bg-[#060818];
     }
 
-    /* Panel */
-    .panel {
-        @apply relative rounded-md bg-white p-5 shadow dark:bg-black;
+    .chat-users {
+        @apply flex-1 overflow-y-auto px-2;
+        min-height: 0; /* flex-item 스크롤 깨짐 방지 */
     }
+
+    /* Panel */
+     .panel {
+        @apply relative rounded-md bg-white p-5 shadow dark:bg-black;
+    } 
+
+    /* .panel {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    } */
 
     /* Navbar */
     .navbar-sticky header,

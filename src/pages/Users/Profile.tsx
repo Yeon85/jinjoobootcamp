@@ -31,7 +31,7 @@ const Profile = () => {
         id:user.id,
         userId:user.id,
         profileImage: user.profileImage,
-        name: '',
+        name: user.name,
         job_title: '',
         birthday: '',
         location: '',
@@ -55,18 +55,18 @@ const Profile = () => {
 
 
     const fetchUserDetails = async () => {
-    if (!user?.id) {
-        console.error('유저 ID가 없습니다.');
-        return;
-    }
+        if (!user?.id) {
+            console.error('유저 ID가 없습니다.');
+            return;
+        }
 
-    try {
-        const response = await axios.get(`http://localhost:5000/api/user/${user.id}`);
-        console.log('유저 정보 가져오기 성공', response.data);
-        setFormData((prev) => ({ ...prev, ...response.data.user }));
-    } catch (error) {
-        console.error('유저 정보 가져오기 실패', error);
-    }
+        try {
+            const response = await axios.get(`${API_URL}/api/user/${user.id}`);
+            console.log('유저 정보 가져오기 성공', response.data);
+            setFormData((prev) => ({ ...prev, ...response.data.user }));
+        } catch (error) {
+            console.error('유저 정보 가져오기 실패', error);
+        }
     };
 
     return (

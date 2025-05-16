@@ -66,7 +66,7 @@ const Header = () => {
                 dispatch(loginUser(userData));  // localStorage에서 복구
             }
         } else {
-            alert('로그인 정보가 없습니다. 다시 로그인 해주세요.');
+           // alert('로그인 정보가 없습니다. 다시 로그인 해주세요.');
             navigate('/auth/boxed-signin');
         }
         const selector = document.querySelector('ul.horizontal-menu a[href="' + window.location.pathname + '"]');
@@ -190,7 +190,7 @@ const Header = () => {
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="main-logo flex items-center shrink-0">
                             <img className="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo.svg" alt="logo" />
-                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300">BOOTCAMP</span>
+                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300">지아캠프</span>
                         </Link>
                         <button
                             type="button"
@@ -749,6 +749,9 @@ const Header = () => {
                         <ul className="sub-menu">
                             <li>
                                 <NavLink to="/apps/chat">{t('chat')}</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/apps/wbs">{t('wbs')}</NavLink>
                             </li>
                             <li>
                                 <NavLink to="/apps/mailbox">{t('mailbox')}</NavLink>

@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 const Index = lazy(() => import('../pages/Index'));
+const Call = lazy(() => import('../pages/Apps/Call/Call'));
 const Analytics = lazy(() => import('../pages/Analytics'));
 const Finance = lazy(() => import('../pages/Finance'));
 const Crypto = lazy(() => import('../pages/Crypto'));
@@ -8,6 +9,7 @@ const Mailbox = lazy(() => import('../pages/Apps/Mailbox'));
 const Notes = lazy(() => import('../pages/Apps/Notes'));
 const Contacts = lazy(() => import('../pages/Apps/Contacts'));
 const Chat = lazy(() => import('../pages/Apps/Chat'));
+const Wbs = lazy(() => import('../pages/Apps/Wbs'));
 const Scrumboard = lazy(() => import('../pages/Apps/Scrumboard'));
 const Calendar = lazy(() => import('../pages/Apps/Calendar'));
 const List = lazy(() => import('../pages/Apps/Invoice/List'));
@@ -101,18 +103,20 @@ const DateRangePicker = lazy(() => import('../pages/Forms/DateRangePicker'));
 const Clipboard = lazy(() => import('../pages/Forms/Clipboard'));
 
 const SurveyPage = lazy(() => import('@/pages/Survey/SurveyPage'));
-const SurveyEditPage = lazy(() => import('@/pages/Survey/SurveyEditPage')); // ✅ 추가!!
+//const SurveyEditPage = lazy(() => import('@/pages/Survey/SurveyEditPage')); // ✅ 추가!!
 
 const routes = [
+    //전화
+    {
+        path: '/call',
+        element: <Call />,
+    },
     //설문지
     {
         path: '/survey',
         element: <SurveyPage />,
     },
-    {
-        path: '/survey/edit/:id',  // ✅ 수정 페이지 라우터
-        element: <SurveyEditPage />,
-      },
+   
     // dashboard
     {
         path: '/',
@@ -169,6 +173,10 @@ const routes = [
     {
         path: '/apps/calendar',
         element: <Calendar />,
+    },
+    {
+        path: '/apps/wbs',
+        element: <Wbs />,
     },
     // preview page
     {
