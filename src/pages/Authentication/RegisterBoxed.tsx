@@ -53,21 +53,25 @@ const RegisterBoxed = () => {
         let response;
         try {
            
-            response = await axios.post(`${API_URL}/api/register`, { 
-                userId,
-                name,
-                email,
-                password,
+           response = await axios.post(`${API_URL}/api/register`, {
+            userId,
+            name,
+            email,
+            password,
             });
-            const userData = response;  // ✅ 여기 수정
-            console.log("!!!!!userData:",userData.data.user);
-            dispatch(loginUser(userData.data.user));
-         
-            // 2. 알림
-            alert('🚀환영합니다.');
-         
 
-            if (response.data.user.user_extra) {
+            console.log("🔥 response:", response);
+
+            const user = response.data?.user;
+
+            if (user) {
+            dispatch(loginUser(user));
+            alert("🎉 환영합니다.");
+            } else {
+            alert("회원가입 완료! 로그인 해주세요.");
+            }
+
+            if (response.data?.user?.user_extra) {
                 navigate('/'); // 메인으로
             } else {
                 navigate('/survey'); // 추가정보 작성페이지로
