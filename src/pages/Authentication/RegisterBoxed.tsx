@@ -66,6 +66,8 @@ const RegisterBoxed = () => {
 
             if (user) {
             dispatch(loginUser(user));
+            // ✅ localStorage에도 저장(헤더/설문 페이지에서 복구할 때 최신 사용자 유지)
+            localStorage.setItem('user', JSON.stringify(user));
             alert("🎉 환영합니다.");
             } else {
             alert("회원가입 완료! 로그인 해주세요.");

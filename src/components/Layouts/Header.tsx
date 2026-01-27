@@ -34,7 +34,7 @@ import IconMenuPages from '../Icon/Menu/IconMenuPages';
 import IconMenuMore from '../Icon/Menu/IconMenuMore';
 //추가
 import { useNavigate } from 'react-router-dom';  // 추가
-import { loginUser } from '@/store/userSlice';
+import { loginUser, logoutUser } from '@/store/userSlice';
 import axios from 'axios';
 import ApplicationConfig from '../../application';
 
@@ -62,7 +62,8 @@ const Header = () => {
         if (savedUser) {
             const userData = JSON.parse(savedUser);
             //console.log('userData:', userData); // ✅ 여기서 id 값 다시 확인
-            if (!email) {
+            // ✅ 이미 로그인된 상태면 localStorage로 덮어쓰지 않기
+            if (!user.isLoggedIn && !user.id) {
                 dispatch(loginUser(userData));  // localStorage에서 복구
             }
         } else {
@@ -88,6 +89,12 @@ const Header = () => {
             }
         }
     }, [location]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        dispatch(logoutUser());
+        navigate('/auth/boxed-signin');
+    };
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
@@ -505,10 +512,10 @@ const Header = () => {
                                         </Link>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <Link to="/auth/boxed-signin" className="text-danger !py-3">
+                                        <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                                             Sign Out
-                                        </Link>
+                                        </button>
                                     </li>
                                 </ul>
                             </Dropdown>

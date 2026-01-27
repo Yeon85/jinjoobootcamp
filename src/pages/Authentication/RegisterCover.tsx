@@ -46,7 +46,7 @@ const RegisterCover = () => {
         e.preventDefault();
     
         try {
-            const response = await axios.post(`${VITE_URL}/api/register`, {
+            const response = await axios.post(`${API_URL}/api/register`, {
                 userId,
                 name,
                 email,
@@ -54,9 +54,23 @@ const RegisterCover = () => {
             });
     
             console.log('회원가입 성공:', response.data);
-            navigate('/'); // 성공 후 홈으로 이동
-        } catch (error) {
+            // ✅ localStorage에도 저장(헤더/설문 페이지에서 복구할 때 최신 사용자 유지)
+            if (response.data?.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
+            // ✅ 추가정보 입력 여부 확인하고 이동 (RegisterBoxed와 동일 동작)
+            if (response.data?.user?.user_extra) {
+                navigate('/'); // 메인으로
+            } else {
+                navigate('/survey'); // 추가정보 작성페이지로
+            }
+        } catch (error: any) {
             console.error('회원가입 실패:', error);
+            if (error?.response?.data) {
+                alert(error.response.data);
+            } else {
+                alert('회원가입 중 오류가 발생했습니다.');
+            }
         }
     };
 
@@ -133,6 +147,22 @@ const RegisterCover = () => {
                                 <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to register</p>
                             </div>
                             <form className="space-y-5 dark:text-white" onSubmit={submitForm}>
+                                <div>
+                                    <label htmlFor="userId">ID</label>
+                                    <div className="relative text-white-dark">
+                                        <input
+                                            id="userId"
+                                            type="text"
+                                            value={userId}
+                                            onChange={(e) => setUserId(e.target.value)}
+                                            placeholder="Enter Id"
+                                            className="form-input ps-10 placeholder:text-white-dark"
+                                        />
+                                        <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                            <IconUser fill={true} />
+                                        </span>
+                                    </div>
+                                </div>
                                 <div>
                                     <label htmlFor="Name">Name</label>
                                     <div className="relative text-white-dark">

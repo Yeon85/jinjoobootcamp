@@ -32,25 +32,6 @@ import axios from 'axios';
 //import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-type Message = {
-  contactId: number;
-  fromUserId: number;
-  toUserId: number;
-  text: string;
-  time: string;
-};
-
-type Contact = {
-  contactId: number;
-  userId: number;      // 상대 유저 id
-  name: string;
-  path: string;
-  active: number | boolean;
-  time: string;        // lastSeenTime
-  preview: string;
-  messages: Message[];
-};
-
 const Chat = () => {
    // const user = useSelector((state) => state.user); // 🔥 Redux user
    const formatDateTime = (timeString: string) => {
@@ -78,13 +59,15 @@ const Chat = () => {
 
     const API_URL = ApplicationConfig.API_URL;
 
-  const [contactList, setContactList] = useState<Contact[]>([]);
-  const [filteredItems, setFilteredItems] = useState<Contact[]>([]);
-  const [searchUser, setSearchUser] = useState('');
-  const [isShowUserChat, setIsShowUserChat] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<Contact | null>(null);
-  const [isShowChatMenu, setIsShowChatMenu] = useState(false);
-  const [textMessage, setTextMessage] = useState('');
+    const [contactList, setContactList] = useState<any[]>([]);
+    const [searchUser, setSearchUser] = useState('');
+    const [isShowUserChat, setIsShowUserChat] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [isShowChatMenu, setIsShowChatMenu] = useState(false);
+    const [textMessage, setTextMessage] = useState('');
+    //const [filteredItems, setFilteredItems] = useState<any>(contactList);
+    const [filteredItems, setFilteredItems] = useState<any[]>([]);
+
     useEffect(() => {
         console.log("user", user);
 
@@ -101,29 +84,24 @@ const Chat = () => {
     console.log("user",user); // ✅ Redux user 확인하기
 
     const fetchRooms = async () => {
-         try {
-      const res = await axios.get(`${API_URL}/api/contacts/${user.id}`);
-      const contacts: Contact[] = res.data.contacts;
+        try {
+            const res = await axios.get(`${API_URL}/api/rooms`, {
+            params: { myUserId: user.id },
+            });
 
-      if (Array.isArray(contacts)) {
-        setContactList(contacts);
-        setFilteredItems(contacts); // ✅ 절대 messages 넣으면 안됨
-      } else {
-        setContactList([]);
-        setFilteredItems([]);
-      }
-    } catch (e) {
-      setContactList([]);
-      setFilteredItems([]);
-    }
-  };
+            // 서버가 { rooms: [...] } 로 준다고 가정
+            const rooms = res.data.rooms || [];
+            setContactList(rooms);
+            setFilteredItems(rooms); // 검색/리스트용
+        } catch (e) {
+            setContactList([]);
+            setFilteredItems([]);
+        }
+        };
 
     useEffect(() => {
         setFilteredItems(() => {
-            return contactList.filter(d =>
-  d.name?.toLowerCase().includes(searchUser.toLowerCase())
-)
-
+            return contactList.filter((d) => d.name.toLowerCase().includes(searchUser.toLowerCase()));
         });
     }, [searchUser, contactList]);
 
@@ -145,57 +123,51 @@ const Chat = () => {
             }
         });
     };
-const sendMessage = async () => {
-    if (!textMessage.trim() || !selectedUser) return;
 
-    console.log("selectedUser.contactId:"+selectedUser.contactId);
-    console.log("selectedUser.messages.contactId:"+selectedUser.messages[0].contactId);
-    console.log("selectedUser:", JSON.stringify(selectedUser));
-
-    console.log("selectedUser.userId:"+selectedUser.userId);
-    console.log("selectedUser:", JSON.stringify(selectedUser));
-
-//selectedUser: {"userId":6,"name":"6","path":"profile-35.png","active":0,"time":"2026-01-27T07:30:56.000Z","preview":null,"messages":[{"contactId":5,"fromUserId":1,"toUserId":6,"text":"친구 추가되었습니다.","time":"2026-01-27T07:30:56.000Z"}]}
-    const newMessage = {
-      contactId: selectedUser.messages[0].contactId,
-      fromUserId: user.id,
-      toUserId: selectedUser.userId,
-      text: textMessage,
+    const sendMessage = async () => {
+        if (textMessage.trim() && selectedUser) {
+            try {
+                const newMessage = {
+                    contactId: selectedUser.contactId, // ✅ 이거 추가
+                    fromUserId: loginUser.id,
+                    toUserId: selectedUser.userId,
+                    text: textMessage,
+                };
+    
+                // 1. 서버로 메시지 전송 (DB 저장)
+                await axios.post(`${API_URL}/api/messages`, newMessage);
+    
+                // 2. 성공하면 화면에도 반영
+                const updatedList = [...contactList];
+                const user = updatedList.find((d) => d.userId === selectedUser.userId);
+    
+                if (user) {
+                    if (!user.messages) {
+                        user.messages = [];
+                    }
+                    user.messages.push({
+                        ...newMessage,
+                        time: new Date().toISOString(), // 시간 직접 추가
+                    });
+                    setContactList(updatedList);
+                    setFilteredItems(updatedList);
+                }
+    
+                // 3. 입력창 비우기
+                setTextMessage('');
+                scrollToBottom();
+            } catch (error) {
+                console.error('메시지 보내기 실패:', error);
+                alert('메시지를 보내는 데 실패했습니다.');
+            }
+        }
     };
 
-    console.log("newMessage:"+newMessage);
-    try {
-      await axios.post(`${API_URL}/api/messages`, newMessage);
-
-      // ✅ 화면 반영 (selectedUser / contactList 둘 다 업데이트)
-      const msgToAdd: Message = { ...newMessage, time: new Date().toISOString() };
-
-      // contactList 업데이트
-      setContactList((prev) =>
-        prev.map((c) =>
-          c.contactId === selectedUser.contactId
-            ? { ...c, messages: [...(c.messages || []), msgToAdd], preview: msgToAdd.text }
-            : c
-        )
-      );
-
-      // selectedUser도 업데이트 (안하면 오른쪽이 안 바뀜)
-      setSelectedUser((prev) =>
-        prev ? { ...prev, messages: [...(prev.messages || []), msgToAdd], preview: msgToAdd.text } : prev
-      );
-
-      setTextMessage('');
-      scrollToBottom();
-    } catch (err) {
-      console.error('메시지 보내기 실패:', err);
-      alert('메시지 보내는 데 실패했습니다.');
-    }
-  };
-
-  const sendMessageHandle = (e: any) => {
-    if (e.key === 'Enter') sendMessage();
-  };
-
+    const sendMessageHandle = (e: any) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    };
 
     return (
         <div>

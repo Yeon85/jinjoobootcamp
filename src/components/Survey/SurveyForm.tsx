@@ -40,9 +40,12 @@ const SurveyForm = () => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       const userData = JSON.parse(savedUser);
-      dispatch(loginUser(userData));
+      // ✅ 이미 로그인된 상태면 localStorage로 덮어쓰지 않기
+      if (!user.isLoggedIn && !user.id) {
+        dispatch(loginUser(userData));
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, user.id, user.isLoggedIn]);
    
   useEffect(() => {
     const fetchSurvey = async () => {

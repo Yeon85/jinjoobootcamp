@@ -68,6 +68,7 @@ const LoginBoxed = () => {
                 email: response.data.user.email,
                 profileImage: response.data.user.profileImage,  // 혹시 없으면 profileImage는 생략해도 됨
                 role_code:response.data.user.role_code,
+                user_extra: response.data.user.user_extra,
             }));
     
             // ✅ 추가정보 입력 여부 확인하고 이동
