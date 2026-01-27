@@ -3,10 +3,9 @@ import { io, Socket } from 'socket.io-client';
 
 import { IRootState } from '../../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { setPageTitle } from '../../store/themeConfigSlice';
-
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
 import IconSettings from '../../components/Icon/IconSettings';
 import IconHelpCircle from '../../components/Icon/IconHelpCircle';
@@ -29,12 +28,9 @@ import IconSend from '../../components/Icon/IconSend';
 import IconMicrophoneOff from '../../components/Icon/IconMicrophoneOff';
 import IconDownload from '../../components/Icon/IconDownload';
 import IconCamera from '../../components/Icon/IconCamera';
-
 import ApplicationConfig from '../../application';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
 
 type Message = {
   contactId: number;
@@ -45,50 +41,38 @@ type Message = {
 };
 
 type Contact = {
-  contactId: number; // contacts 테이블 id
-  userId: number; // 상대 유저 id
+  contactId: number;
+  userId: number;
   name: string;
-  path: string; // 상대 프로필 이미지 경로(/uploads/.. or profile-xx.png 등)
+  path: string;
   active: number | boolean;
-  time: string; // lastSeenTime or lastMessageTime
-  preview: string; // lastPreview
+  time: string;
+  preview: string;
   messages: Message[];
 };
 
 const Chat = () => {
+  const API_URL = ApplicationConfig.API_URL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const API_URL = ApplicationConfig.API_URL;
-
   const user = useSelector((state: IRootState) => state.user);
-
-  const loginUser = {
-    id: user.id,
-    name: user.name,
-    path: user.profileImage, // 내 프로필 이미지 (/uploads/..)
-    designation: user.job_title || 'User',
-  };
-
   const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl';
   const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
 
   const socketRef = useRef<Socket | null>(null);
 
-  const [tab, setTab] = useState<Tab>('chats');
+  const [tab, setTab] = useState<'users' | 'chats' | 'contacts' | 'calls' | 'noti'>('chats');
 
   const [contactList, setContactList] = useState<Contact[]>([]);
   const [filteredItems, setFilteredItems] = useState<Contact[]>([]);
   const [searchUser, setSearchUser] = useState('');
-
   const [isShowUserChat, setIsShowUserChat] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Contact | null>(null);
   const [isShowChatMenu, setIsShowChatMenu] = useState(false);
-
   const [textMessage, setTextMessage] = useState('');
 
   const formatDateTime = (timeString: string) => {
-    if (!timeString) return '';
     const date = new Date(timeString);
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -100,17 +84,16 @@ const Chat = () => {
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      const element: any = document.querySelector('.chat-conversation-box');
-      if (element) element.scrollTop = element.scrollHeight;
-    }, 50);
+      const el: any = document.querySelector('.chat-conversation-box');
+      if (el) el.scrollTop = el.scrollHeight;
+    });
   };
 
-  // 이미지 경로 처리 (uploads면 API_URL 붙이고, 아니면 assets)
-  const resolveImg = (p?: string) => {
-    if (!p) return `/assets/images/profile-35.png`;
-    if (p.startsWith('/uploads')) return `${API_URL}${p}`;
-    if (p.startsWith('http')) return p;
-    return `/assets/images/${p}`;
+  const getImgSrc = (path?: string) => {
+    if (!path) return `/assets/images/profile-35.png`;
+    if (path.startsWith('/uploads')) return `${API_URL}${path}`;
+    if (path.startsWith('http')) return path;
+    return `/assets/images/${path}`;
   };
 
   const fetchRooms = async () => {
@@ -131,7 +114,7 @@ const Chat = () => {
     }
   };
 
-  // 로그인/초기 진입
+  // ✅ 초기 진입
   useEffect(() => {
     if (!user.id) {
       navigate('/auth/boxed-signin');
@@ -140,7 +123,6 @@ const Chat = () => {
 
     dispatch(setPageTitle('Chat'));
 
-    // socket 연결 (1회)
     if (!socketRef.current) {
       socketRef.current = io(API_URL, { withCredentials: true });
     }
@@ -149,13 +131,12 @@ const Chat = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);
 
-  // socket 이벤트 수신
+  // ✅ 소켓 메시지 수신
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
 
     const onNewMessage = (msg: Message) => {
-      // contactList 업데이트 (마지막 메시지/시간)
       setContactList((prev) =>
         prev.map((c) =>
           c.contactId === msg.contactId
@@ -164,7 +145,6 @@ const Chat = () => {
         )
       );
 
-      // 보고 있는 방이면 selectedUser도 업데이트
       setSelectedUser((prev) => {
         if (!prev) return prev;
         if (prev.contactId !== msg.contactId) return prev;
@@ -175,24 +155,16 @@ const Chat = () => {
     };
 
     socket.on('newMessage', onNewMessage);
-
-    return () => {
-      socket.off('newMessage', onNewMessage);
-    };
+    return () => socket.off('newMessage', onNewMessage);
   }, []);
 
-  // 검색 필터 + tab 필터(현재는 chats/contacts 둘 다 contactList 동일 사용)
+  // ✅ 검색 필터(탭이 chats/contacts 일 때만 적용)
   useEffect(() => {
-    const keyword = searchUser.toLowerCase();
+    if (tab !== 'chats' && tab !== 'contacts') return;
 
-    // ✅ tab에 따라 리스트를 바꿔 보여주고 싶으면 여기서 분기
-    // 지금은 chats/contacts 둘 다 contactList를 보여주되,
-    // users/calls/noti 는 빈 상태로 처리(원하면 나중에 API 붙이면 됨)
-    let base: Contact[] = [];
-    if (tab === 'chats' || tab === 'contacts') base = contactList;
-    else base = [];
-
-    setFilteredItems(base.filter((d) => (d.name || '').toLowerCase().includes(keyword)));
+    setFilteredItems(() => {
+      return contactList.filter((d) => d.name?.toLowerCase().includes(searchUser.toLowerCase()));
+    });
   }, [searchUser, contactList, tab]);
 
   const selectUser = (person: Contact) => {
@@ -201,8 +173,7 @@ const Chat = () => {
     setIsShowChatMenu(false);
 
     // 방 조인
-    const socket = socketRef.current;
-    if (socket) socket.emit('joinRoom', { contactId: person.contactId });
+    socketRef.current?.emit('joinRoom', { contactId: person.contactId });
 
     scrollToBottom();
   };
@@ -210,22 +181,17 @@ const Chat = () => {
   const sendMessage = async () => {
     if (!textMessage.trim() || !selectedUser) return;
 
-    // contactId 안전하게
-    const contactId = selectedUser.messages?.[0]?.contactId ?? selectedUser.contactId;
+    const contactId = selectedUser?.messages?.[0]?.contactId ?? selectedUser.contactId;
 
     const payload = {
       contactId,
-      fromUserId: loginUser.id,
-     _heap: undefined,
+      fromUserId: user.id,
       toUserId: selectedUser.userId,
       text: textMessage,
     };
 
     try {
       await axios.post(`${API_URL}/api/messages`, payload);
-
-      // 서버가 socket emit 하는 구조면 여기서 굳이 append 안해도 됨.
-      // (만약 서버가 emit 안하면 여기서 로컬 append 처리하면 됨)
       setTextMessage('');
       scrollToBottom();
     } catch (err) {
@@ -238,10 +204,16 @@ const Chat = () => {
     if (e.key === 'Enter') sendMessage();
   };
 
+  // ✅ 왼쪽 리스트에 무엇을 보여줄지(탭에 따라)
+  const leftList = useMemo(() => {
+    if (tab === 'contacts' || tab === 'chats') return filteredItems;
+    return []; // users/calls/noti는 나중에 확장
+  }, [tab, filteredItems]);
+
   return (
     <div>
       <div className={`flex gap-5 relative sm:h-[calc(100vh_-_150px)] h-full sm:min-h-0 ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
-        {/* LEFT */}
+        {/* ✅ LEFT PANEL */}
         <div
           className={`panel p-0 flex-none max-w-xs w-full absolute xl:relative z-10 space-y-4 xl:h-full hidden xl:block overflow-hidden ${
             isShowChatMenu ? '!block' : ''
@@ -252,7 +224,7 @@ const Chat = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className="flex-none">
-                  <img src={resolveImg(loginUser.path)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
+                  <img src={getImgSrc(user.profileImage)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
                 </div>
                 <div className="mx-3">
                   <p className="mb-1 font-semibold">{user.name}</p>
@@ -305,7 +277,7 @@ const Chat = () => {
               </div>
             </div>
 
-            {/* tabs */}
+            {/* ✅ TABS (동작하도록 수정) */}
             <div className="flex justify-between items-center text-xs mt-4">
               <button type="button" className={`hover:text-primary ${tab === 'users' ? 'text-primary' : ''}`} onClick={() => setTab('users')}>
                 <IconUser className="mx-auto mb-1" />
@@ -322,10 +294,10 @@ const Chat = () => {
                 Calls
               </button>
 
-              <button type="button" className="hover:text-primary" onClick={() => navigate('/apps/contacts')}>
-        <IconUserPlus className="mx-auto mb-1" />
-        Contacts
-    </button>
+              <button type="button" className={`hover:text-primary ${tab === 'contacts' ? 'text-primary' : ''}`} onClick={() => setTab('contacts')}>
+                <IconUserPlus className="mx-auto mb-1" />
+                Contacts
+              </button>
 
               <button type="button" className={`hover:text-primary ${tab === 'noti' ? 'text-primary' : ''}`} onClick={() => setTab('noti')}>
                 <IconBell className="w-5 h-5 mx-auto mb-1" />
@@ -335,11 +307,11 @@ const Chat = () => {
 
             <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
 
-            {/* list */}
+            {/* ✅ list 영역: chats/contacts에서 contact 리스트 표시 */}
             <div className="!mt-0">
               <PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_357px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
-                {filteredItems && filteredItems.length > 0 ? (
-                  filteredItems.map((person: Contact) => (
+                {(tab === 'chats' || tab === 'contacts') && leftList.length > 0 ? (
+                  leftList.map((person: Contact) => (
                     <div key={person.userId}>
                       <button
                         type="button"
@@ -351,13 +323,14 @@ const Chat = () => {
                         <div className="flex-1">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 relative">
-                              <img src={resolveImg(person.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
+                              <img src={getImgSrc(person.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
                               {!!person.active && (
                                 <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
                                   <div className="w-4 h-4 bg-success rounded-full"></div>
                                 </div>
                               )}
                             </div>
+
                             <div className="mx-3 ltr:text-left rtl:text-right">
                               <p className="mb-1 font-semibold">{person.name}</p>
                               <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview}</p>
@@ -366,26 +339,27 @@ const Chat = () => {
                         </div>
 
                         <div className="font-semibold whitespace-nowrap text-xs">
-                          <p>{formatDateTime(person.time)}</p>
+                          <p>{person.time ? formatDateTime(person.time) : ''}</p>
                         </div>
                       </button>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center text-gray-400 p-4">{tab === 'users' || tab === 'calls' || tab === 'noti' ? 'Not implemented yet' : 'No contacts found'}</div>
+                  <div className="text-center text-gray-400 p-4">
+                    {tab === 'users' && 'Users 탭(추후 구현)'}
+                    {tab === 'calls' && 'Calls 탭(추후 구현)'}
+                    {tab === 'noti' && 'Notification 탭(추후 구현)'}
+                    {(tab === 'chats' || tab === 'contacts') && 'No contacts found'}
+                  </div>
                 )}
               </PerfectScrollbar>
             </div>
           </div>
         </div>
 
-        {/* overlay */}
-        <div
-          className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`}
-          onClick={() => setIsShowChatMenu(!isShowChatMenu)}
-        />
+        <div className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`} onClick={() => setIsShowChatMenu(!isShowChatMenu)}></div>
 
-        {/* RIGHT */}
+        {/* ✅ RIGHT PANEL */}
         <div className="panel p-0 flex-1">
           {!isShowUserChat && (
             <div className="flex items-center justify-center h-full relative p-4">
@@ -394,7 +368,11 @@ const Chat = () => {
               </button>
 
               <div className="py-8 flex items-center justify-center flex-col">
-                <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[220px] mx-auto">
+                <div className="w-[280px] md:w-[430px] mb-8 h-[calc(100vh_-_320px)] min-h-[120px] text-white dark:text-black flex items-center justify-center">
+                  Select a user to start chatting
+                </div>
+
+                <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[190px] mx-auto">
                   <IconMessage className="ltr:mr-2 rtl:ml-2" />
                   Click User To Chat
                 </p>
@@ -404,7 +382,7 @@ const Chat = () => {
 
           {isShowUserChat && selectedUser ? (
             <div className="relative h-full">
-              {/* top bar */}
+              {/* header */}
               <div className="flex justify-between items-center p-4">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <button type="button" className="xl:hidden hover:text-primary" onClick={() => setIsShowChatMenu(!isShowChatMenu)}>
@@ -412,7 +390,7 @@ const Chat = () => {
                   </button>
 
                   <div className="relative flex-none">
-                    <img src={resolveImg(selectedUser.path)} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" />
+                    <img src={getImgSrc(selectedUser.path)} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" />
                     <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
                       <div className="w-4 h-4 bg-success rounded-full"></div>
                     </div>
@@ -428,7 +406,6 @@ const Chat = () => {
                   <button type="button">
                     <IconPhoneCall className="hover:text-primary" />
                   </button>
-
                   <button type="button">
                     <IconVideo className="w-5 h-5 hover:text-primary" />
                   </button>
@@ -478,58 +455,39 @@ const Chat = () => {
 
               <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
 
-              {/* conversation */}
+              {/* messages */}
               <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_300px)] chat-conversation-box">
                 <div className="space-y-5 p-4 sm:pb-0 pb-[68px] sm:min-h-[300px] min-h-[400px]">
-                  <div className="block m-6 mt-0">
-                    <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
-                      <span className="relative top-2 px-3 bg-white dark:bg-black">{'Today, ' + formatDateTime(selectedUser.time)}</span>
-                    </h4>
-                  </div>
-
-                  {selectedUser.messages && selectedUser.messages.length ? (
+                  {selectedUser.messages?.length ? (
                     <>
                       {selectedUser.messages.map((message: Message, index: number) => {
-                        console.log('--- MESSAGE DEBUG ---');
-  console.log('loginUser.id:', loginUser.id);
-  console.log('selectedUser.userId:', selectedUser.userId);
-  console.log('message.fromUserId:', message.fromUserId);
-  console.log('message.toUserId:', message.toUserId);
-  console.log('message.text:', message.text);
-       console.log('--- MESSAGE DEBUG ---');
-       console.log("loginUser:"+JSON.stringify(loginUser));
-       console.log("selectedUser:"+JSON.stringify(selectedUser));
-       console.log("messagev:"+JSON.stringify(message));
-                        const isMine = message.fromUserId === loginUser.id; // ✅ 핵심
+                        const isOther = message.fromUserId === selectedUser.userId; // ✅ 상대가 보낸건지
                         return (
                           <div key={index}>
-                            <div className={`flex items-start gap-3 ${isMine ? 'justify-end' : ''}`}>
-                              <div className={`flex-none ${isMine ? 'order-2' : ''}`}>
-                                <img
-                                  src={isMine ? resolveImg(loginUser.path) : resolveImg(selectedUser.path)}
-                                  className="rounded-full h-10 w-10 object-cover"
-                                  alt=""
-                                />
+                            <div className={`flex items-start gap-3 ${isOther ? '' : 'justify-end'}`}>
+                              <div className={`flex-none ${isOther ? '' : 'order-2'}`}>
+                                {isOther ? (
+                                  <img src={getImgSrc(selectedUser.path)} className="rounded-full h-10 w-10 object-cover" alt="other" />
+                                ) : (
+                                  <img src={getImgSrc(user.profileImage)} className="rounded-full h-10 w-10 object-cover" alt="me" />
+                                )}
                               </div>
 
                               <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                   <div
                                     className={`dark:bg-gray-800 p-4 py-2 rounded-md bg-black/10 ${
-                                      isMine
-                                        ? 'ltr:rounded-bl-none rtl:rounded-br-none'
-                                        : 'ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white'
+                                      isOther ? 'ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white' : 'ltr:rounded-bl-none rtl:rounded-br-none'
                                     }`}
                                   >
                                     {message.text}
                                   </div>
-
-                                  <div className={`${isMine ? 'hidden' : ''}`}>
+                                  <div className={`${isOther ? '' : 'hidden'}`}>
                                     <IconMoodSmile className="hover:text-primary" />
                                   </div>
                                 </div>
 
-                                <div className={`text-xs text-white-dark ${isMine ? 'ltr:text-right rtl:text-left' : ''}`}>
+                                <div className={`text-xs text-white-dark ${isOther ? '' : 'ltr:text-right rtl:text-left'}`}>
                                   {message.time ? formatDateTime(message.time) : ''}
                                 </div>
                               </div>
@@ -539,7 +497,7 @@ const Chat = () => {
                       })}
                     </>
                   ) : (
-                    ''
+                    <div className="text-center text-gray-400 p-4">No messages</div>
                   )}
                 </div>
               </PerfectScrollbar>
@@ -558,11 +516,7 @@ const Chat = () => {
                     <button type="button" className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 hover:text-primary">
                       <IconMoodSmile />
                     </button>
-                    <button
-                      type="button"
-                      className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary"
-                      onClick={() => sendMessage()}
-                    >
+                    <button type="button" className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary" onClick={sendMessage}>
                       <IconSend />
                     </button>
                   </div>
@@ -584,9 +538,7 @@ const Chat = () => {
                 </div>
               </div>
             </div>
-          ) : (
-            ''
-          )}
+          ) : null}
         </div>
       </div>
     </div>

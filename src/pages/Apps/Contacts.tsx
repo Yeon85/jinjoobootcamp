@@ -105,7 +105,7 @@ const Contacts = () => {
                 myUserId: user.id,
                 targetUserId: Number(params.targetUserId),
                 name: params.name,
-                path: params.path || 'user-profile.png',
+                path: 'user-profile.png',
             });
             showMessage('친구가 추가되었습니다.');
             setAddContactModal(false);
@@ -231,7 +231,7 @@ const Contacts = () => {
                                             height: '100%',
                                         }}
                                     >
-                                        <img className="object-contain w-4/5 max-h-40 mx-auto" src={`/assets/images/${contact.path}`} alt="contact_image" />
+                                        <img className="object-contain w-4/5 max-h-40 mx-auto" src={`/${contact.path}`} alt="contact_image" />
                                     </div>
                                     <div className="px-6 pb-24 -mt-10 relative">
                                         <div className="shadow-md bg-white dark:bg-gray-900 rounded-md px-2 py-4">

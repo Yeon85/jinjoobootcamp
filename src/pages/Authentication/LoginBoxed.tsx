@@ -81,7 +81,7 @@ const LoginBoxed = () => {
             if (error.response) {
                 alert("에러메세지 ||" + error.response.data); // 에러 메시지 표시
             } else {
-                alert('로그인 중 오류 발생2');
+                alert('로그인 중 오류 발생:' + error.message);
             }
         }
     };
