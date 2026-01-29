@@ -142,7 +142,7 @@ const Profile = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="panel lg:col-span-2 xl:col-span-3">
+                    <div className="panel lg:col-span-2 xl:col-span-3 invisible">
                         <div className="mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Task</h5>
                         </div>
@@ -235,7 +235,7 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 invisible">
                     <div className="panel">
                         <div className="mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Summary</h5>

@@ -44,16 +44,17 @@ type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
 
 type Message = {
   contactId: number;
-  fromUserId: number;
-  toUserId: number;
+  fromUserId: string;
+  toUserId: string;
   text: string;
   time: string;
 };
 
 type Contact = {
   contactId: number;
-  userId: number;
+  userId: string;
   name: string;
+  nameId:string;
   path: string;
   active: number | boolean;
   time: string;
@@ -70,6 +71,7 @@ const Chat = () => {
 
   const loginUserObj = {
     id: user.id,
+    nameId:user.nameId,
     name: user.name,
     path: user.profileImage,
     designation: user.job_title || 'User',
@@ -153,16 +155,21 @@ const Chat = () => {
 
   //프로필편집 이동
   const handleProfile = () => {
-    navigate('/auth/boxed-signin');
+    navigate('/users/profile');
   };
 
   // ✅ 친구추가
   const addFriend = async (targetUserId: number) => {
     try {
+
+      console.log("user.nameId:"+user.nameId);    
       await axios.post(`${API_URL}/api/contacts`, {
         myUserId: user.id,
+        nameId:user.nameId,
         targetUserId: targetUserId,
       });
+
+
       alert('친구추가 완료!');
       fetchRooms(); // 친구목록 다시 불러오기
     } catch (e: any) {
@@ -342,6 +349,7 @@ const Chat = () => {
                   <img src={resolveImg(loginUserObj.path)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
                 </div>
                 <div className="mx-3">
+                  vvvvv:<p className="mb-1 font-semibold">{user.nameId}</p>
                   <p className="mb-1 font-semibold">{user.name}</p>
                   <p className="text-xs text-white-dark">{user.email}</p>
                 </div>
@@ -595,7 +603,7 @@ const Chat = () => {
 
                     <div className="mx-3">
                       <p className="font-semibold">{selectedUser.name}</p>
-                      <p className="text-white-dark text-xs">{selectedUser.active ? 'Active now' : 'Last seen at ' + formatDateTime(selectedUser.time)}</p>
+                      <p className="text-white-dark text-xs">{selectedUser.active ? 'Active now' : '마지막 접속해 있었던 시간  ' + formatDateTime(selectedUser.time)}</p>
                     </div>
                   </div>
 
@@ -618,25 +626,25 @@ const Chat = () => {
                           <li>
                             <button type="button">
                               <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                              Search
+                              검색
                             </button>
                           </li>
                           <li>
                             <button type="button">
                               <IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              Copy
+                              복사
                             </button>
                           </li>
                           <li>
                             <button type="button">
                               <IconTrashLines className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              Delete
+                              삭제
                             </button>
                           </li>
                           <li>
                             <button type="button">
                               <IconShare className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              Share
+                              동기화
                             </button>
                           </li>
                           <li>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../store';
 import ReactApexChart from 'react-apexcharts';
@@ -18,10 +17,20 @@ import IconUser from '../components/Icon/IconUser';
 import IconNetflix from '../components/Icon/IconNetflix';
 import IconBolt from '../components/Icon/IconBolt';
 import IconCaretDown from '../components/Icon/IconCaretDown';
+import IconLogout from '../components/Icon/IconLogout';
 import IconPlus from '../components/Icon/IconPlus';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
+import { loginUser, logoutUser } from '@/store/userSlice';
+import { useNavigate } from 'react-router-dom';  // 추가
+import { Link, NavLink, useLocation } from 'react-router-dom';
+
 
 const Index = () => {
+
+    
+        const navigate = useNavigate();   // 🔥
+        const location = useLocation();   // 🔥
+
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Sales Admin'));
@@ -31,6 +40,12 @@ const Index = () => {
 
     const [loading] = useState(false);
 
+
+        const handleLogout = () => {
+            localStorage.removeItem('user');
+            dispatch(logoutUser());
+            navigate('/auth/boxed-signin');
+        };
     //Revenue Chart
     const revenueChart: any = {
         series: [
@@ -412,6 +427,10 @@ const Index = () => {
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
                     <span>Sales</span>
                 </li>
+                 <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
+                        <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
+                        로그아웃
+                      </button>
             </ul>
 
             <div className="pt-5">

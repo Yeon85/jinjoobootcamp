@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
   id: number | null;
+  nameId: string;
   name: string;
   email: string;
   profileImage: string;
@@ -20,6 +21,7 @@ interface UserState {
 const initialState: UserState = {
   id: null,
   name: '',
+    nameId: '',
   email: '',
   profileImage: '',
   extraCompleted: false,
@@ -44,6 +46,7 @@ export const userSlice = createSlice({
           const {
               id,
               name,
+              nameId,
               email,
               profileImage,
               extraCompleted,
@@ -59,6 +62,7 @@ export const userSlice = createSlice({
 
           state.id = id;
           state.name = name;
+          state.nameId = nameId;    
           state.email = email;
           state.profileImage = profileImage;
           state.extraCompleted = extraCompleted;
