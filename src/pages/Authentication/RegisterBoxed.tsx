@@ -74,9 +74,9 @@ const RegisterBoxed = () => {
             }
 
             if (response.data?.user?.user_extra) {
-                navigate('/'); // 메인으로
+                navigate('/app/chat'); // 채팅화면
             } else {
-                navigate('/survey'); // 추가정보 작성페이지로
+                navigate('/app/chat'); // 채팅화면으로이동
             }
 
         } catch (error: any) {
@@ -145,18 +145,20 @@ const RegisterBoxed = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">회원 가입</h1>
+                                {/* 
                                 <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to register</p>
+                                 */}
                             </div>
                             <form className="space-y-5 dark:text-white" onSubmit={submitForm}>
                             <div>
-                                    <label htmlFor="userId">ID</label>
+                                    <label htmlFor="userId">아이디</label>
                                     <div className="relative text-white-dark">
                                     <input
                                         id="userId"
                                         type="text"
                                         value={userId}
                                         onChange={(e) => setUserId(e.target.value)}
-                                        placeholder="Enter Id"
+                                        placeholder="아이디"
                                         className="form-input ps-10 placeholder:text-white-dark"
                                     />
                                         {/* <input id="Name" type="text" placeholder="Enter Name" className="form-input ps-10 placeholder:text-white-dark" /> */}
@@ -166,14 +168,14 @@ const RegisterBoxed = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="Name">Name</label>
+                                    <label htmlFor="Name">이름</label>
                                     <div className="relative text-white-dark">
                                     <input
                                         id="Name"
                                         type="text"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        placeholder="Enter Name"
+                                        placeholder="이름"
                                         className="form-input ps-10 placeholder:text-white-dark"
                                     />
                                         {/* <input id="Name" type="text" placeholder="Enter Name" className="form-input ps-10 placeholder:text-white-dark" /> */}
@@ -184,7 +186,7 @@ const RegisterBoxed = () => {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="Email">Email</label>
+                                    <label htmlFor="Email">이메일</label>
                                     <div className="relative text-white-dark">
                                         {/* <input id="Email" type="email" placeholder="Enter Email" className="form-input ps-10 placeholder:text-white-dark" /> */}
                                         <input
@@ -192,7 +194,7 @@ const RegisterBoxed = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Enter Email"
+                                        placeholder="이메일"
                                         className="form-input ps-10 placeholder:text-white-dark"
                                     />
 
@@ -202,7 +204,7 @@ const RegisterBoxed = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="Password">Password</label>
+                                    <label htmlFor="Password">비밀번호</label>
                                     <div className="relative text-white-dark">
                                         {/* <input id="Password" type="password" placeholder="Enter Password" className="form-input ps-10 placeholder:text-white-dark" /> */}
                                         <input
@@ -210,11 +212,9 @@ const RegisterBoxed = () => {
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Enter Password"
+                                        placeholder="비밀번호"
                                         className="form-input ps-10 placeholder:text-white-dark"
                                     />
-                                      
-                                      
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                             <IconLockDots fill={true} />
                                         </span>
@@ -223,18 +223,21 @@ const RegisterBoxed = () => {
                                 <div>
                                     <label className="flex cursor-pointer items-center">
                                         <input type="checkbox" className="form-checkbox bg-white dark:bg-black" />
-                                        <span className="text-white-dark">Subscribe to weekly newsletter</span>
+                                        <span className="text-white-dark">비밀번호저장</span>
                                     </label>
                                 </div>
                                 <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    회원 가입1
+                                    회원 가입!
                                 </button>
                             </form>
                             <div className="relative my-7 text-center md:mb-9">
+                                {/* 
                                 <span className="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
                                 <span className="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
+                                 */}
                             </div>
                             <div className="mb-10 md:mb-[60px]">
+                                {/* 
                                 <ul className="flex justify-center gap-3.5 text-white">
                                     <li>
                                         <Link
@@ -273,9 +276,14 @@ const RegisterBoxed = () => {
                                         </Link>
                                     </li>
                                 </ul>
+
+                                */}
                             </div>
                             <div className="text-center dark:text-white">
-                                Already have an account ?&nbsp;
+{/*                                 Already have an account ?&nbsp;
+
+ */} 
+                                ️계정이 이미 있으신가요?&nbsp;
                                 <Link to="/auth/boxed-signin" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
                                     로그인 (sign in)
                                 </Link>

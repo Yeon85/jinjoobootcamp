@@ -79,7 +79,7 @@ const Sidebar = () => {
                     <div className="flex justify-between items-center px-4 py-3">
                         <NavLink to="/" className="main-logo flex items-center shrink-0">
                             <img className="w-8 ml-[5px] flex-none" src="/assets/images/logo.svg" alt="logo" />
-                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle lg:inline dark:text-white-light">{t('지아부트캠프')}</span>
+                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle lg:inline dark:text-white-light">{t('키즈케어')}</span>
                         </NavLink>
 
                         <button
@@ -91,7 +91,46 @@ const Sidebar = () => {
                         </button>
                     </div>
                     <PerfectScrollbar className="h-[calc(100vh-80px)] relative">
+                    
                         <ul className="relative font-semibold space-y-0.5 p-4 py-0">
+                            <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                                <IconMinus className="w-4 h-5 flex-none hidden" />
+                                <span>{t('지아캠프1')}</span>
+                            </h2>
+
+                                <li className="nav-item">
+                                    <NavLink to="/apps/chat" className="group">
+                                        <div className="flex items-center">
+                                            <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                            <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('chat')}</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+
+                                <li className="nav-item">
+                                    <NavLink to="/apps/chat_1" className="group">
+                                        <div className="flex items-center">
+                                            <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                            <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('chat_1')}</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+
+
+                                <li className="nav-item">
+                                        <NavLink to="/apps/contacts" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuContacts className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('contacts')}</span>
+                                            </div>
+                                        </NavLink>
+                                </li>
+                                    
+
+                            <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                                <IconMinus className="w-4 h-5 flex-none hidden" />
+                                <span>{t('지아캠프2')}</span>
+                            </h2>
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'dashboard' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('dashboard')}>
                                     <div className="flex items-center">
@@ -236,14 +275,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/apps/contacts" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuContacts className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('contacts')}</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                                   
 
                                     <li className="menu nav-item">
                                         <button type="button" className={`${currentMenu === 'invoice' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('invoice')}>

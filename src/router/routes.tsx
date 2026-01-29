@@ -9,6 +9,7 @@ const Mailbox = lazy(() => import('../pages/Apps/Mailbox'));
 const Notes = lazy(() => import('../pages/Apps/Notes'));
 const Contacts = lazy(() => import('../pages/Apps/Contacts'));
 const Chat = lazy(() => import('../pages/Apps/Chat'));
+const Chat_1 = lazy(() => import('../pages/Apps/Chat_1'));
 const Wbs = lazy(() => import('../pages/Apps/Wbs'));
 const Scrumboard = lazy(() => import('../pages/Apps/Scrumboard'));
 const Calendar = lazy(() => import('../pages/Apps/Calendar'));
@@ -77,7 +78,7 @@ const ERROR503 = lazy(() => import('../pages/Pages/Error503'));
 const Maintenence = lazy(() => import('../pages/Pages/Maintenence'));
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
-const UnlockBoxed = lazy(() => import('../pages/Authentication/UnlockBox'));
+const UnlockBox = lazy(() => import('../pages/Authentication/UnlockBox'));
 const RecoverIdBoxed = lazy(() => import('../pages/Authentication/RecoverIdBox'));
 const LoginCover = lazy(() => import('../pages/Authentication/LoginCover'));
 const RegisterCover = lazy(() => import('../pages/Authentication/RegisterCover'));
@@ -165,6 +166,10 @@ const routes = [
     {
         path: '/apps/chat',
         element: <Chat />,
+    },
+    {
+        path: '/apps/chat_1',
+        element: <Chat_1/>,
     },
     {
         path: '/apps/scrumboard',
@@ -463,7 +468,7 @@ const routes = [
     },
     {
         path: '/auth/boxed-lockscreen',
-        element: <UnlockBoxed />,
+        element: <UnlockBox />,
         layout: 'blank',
     },
     {

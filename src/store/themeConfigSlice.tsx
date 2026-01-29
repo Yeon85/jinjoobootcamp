@@ -72,7 +72,7 @@ const themeConfigSlice = createSlice({
             state.sidebar = !state.sidebar;
         },
         setPageTitle(state, { payload }) {
-            document.title = `${payload} || 정연주 부트캠프`;
+            document.title = `${payload} || 키즈케어`;
         },
     },
 });

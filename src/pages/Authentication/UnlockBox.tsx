@@ -99,13 +99,13 @@ const UnlockBox = () => {
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="text-2xl dark:text-white">{name}</h4>
-                                    <p className="text-white-dark">Enter your password to unlock your ID</p>
+                                    <p className="text-white-dark">비밀번호를 입력하여 아이디를 잠금 해제하세요.</p>
                                 </div>
                             </div>
                             <form className="space-y-5" onSubmit={submitForm}>
                                 <div>
                                     <label htmlFor="Password" className="dark:text-white">
-                                        Password
+                                        비밀번호
                                     </label>
                                     <div className="relative text-white-dark">
                                         <input id="Password" type="password" placeholder="Enter Password" className="form-input ps-10 placeholder:text-white-dark" />

@@ -17,19 +17,14 @@ import ApplicationConfig from '../../application';
 import axios from 'axios';
 import { IRootState } from '../../store';
 
-type ContactsProps = {
-    embedded?: boolean; // ✅ Chat 안에서 렌더링할 때 true
-};
-
-const Contacts = ({ embedded = false }: ContactsProps) => {
+const Contacts = () => {
     const dispatch = useDispatch();
     const user = useSelector((state: IRootState) => state.user);
     const API_URL = ApplicationConfig.API_URL;
 
     useEffect(() => {
-        if (!embedded) dispatch(setPageTitle('Contacts'));
-    }, [dispatch, embedded]);
-
+        dispatch(setPageTitle('Contacts'));
+    });
     const [addContactModal, setAddContactModal] = useState<any>(false);
 
     const [value, setValue] = useState<any>('list');
@@ -51,14 +46,6 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
     const [contactList, setContactList] = useState<any[]>([]);
     const [filteredItems, setFilteredItems] = useState<any[]>([]);
 
-    const resolveImg = (p?: string) => {
-        if (!p) return `/assets/images/profile-35.png`;
-        if (p.startsWith('/uploads')) return `${API_URL}${p}`;
-        if (p.startsWith('http')) return p;
-        // user-profile.png 같은 파일명이면 assets로
-        return `/assets/images/${p}`;
-    };
-
     const fetchContacts = async () => {
         if (!user.id) return;
         try {
@@ -75,13 +62,12 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
 
     useEffect(() => {
         fetchContacts();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user.id]);
 
     useEffect(() => {
         setFilteredItems(() => {
             return contactList.filter((item: any) => {
-                return (item.name || '').toLowerCase().includes(String(search || '').toLowerCase());
+                return (item.name || '').toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, contactList]);
@@ -90,7 +76,7 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
         createContact();
     };
 
-    const editUser = () => {
+    const editUser = (user: any = null) => {
         const json = JSON.parse(JSON.stringify(defaultParams));
         setParams(json);
         setAddContactModal(true);
@@ -156,7 +142,7 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                         <div>
                             <button type="button" className="btn btn-primary" onClick={() => editUser()}>
                                 <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                                연락처추가
+                                Add Contact
                             </button>
                         </div>
                         <div>
@@ -171,20 +157,13 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                         </div>
                     </div>
                     <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="검색"
-                            className="form-input py-2 ltr:pr-11 rtl:pl-11 peer"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                        <input type="text" placeholder="Search Contacts" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
                         <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
                             <IconSearch className="mx-auto" />
                         </button>
                     </div>
                 </div>
             </div>
-
             {value === 'list' && (
                 <div className="mt-5 panel p-0 border-0 overflow-hidden">
                     <div className="table-responsive">
@@ -200,12 +179,22 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                             <tbody>
                                 {filteredItems.map((contact: any) => {
                                     return (
-                                        <tr key={`${contact.contactId ?? 'x'}-${contact.userId ?? 'y'}`}>
+                                        <tr key={contact.userId}>
                                             <td>
                                                 <div className="flex items-center w-max">
-                                                    <div className="w-max">
-                                                        <img src={resolveImg(contact.path)} className="h-8 w-8 rounded-full object-cover ltr:mr-2 rtl:ml-2" alt="avatar" />
-                                                    </div>
+                                                    {contact.path && (
+                                                        <div className="w-max">
+                                                            <img src={`${API_URL}${contact.path}`} className="h-8 w-8 rounded-full object-cover ltr:mr-2 rtl:ml-2" alt="avatar" />
+                                                        </div>
+                                                    )}
+                                                    {!contact.path && contact.name && (
+                                                        <div className="grid place-content-center h-8 w-8 ltr:mr-2 rtl:ml-2 rounded-full bg-primary text-white text-sm font-semibold"></div>
+                                                    )}
+                                                    {!contact.path && !contact.name && (
+                                                        <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
+                                                            <IconUser className="w-4.5 h-4.5" />
+                                                        </div>
+                                                    )}
                                                     <div>{contact.name}</div>
                                                 </div>
                                             </td>
@@ -227,15 +216,14 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                 </div>
             )}
 
-            {/* grid는 기존 그대로 유지 (key만 안전하게) */}
             {value === 'grid' && (
                 <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6 mt-5 w-full">
                     {filteredItems.map((contact: any) => {
                         return (
-                            <div className="bg-white dark:bg-[#1c232f] rounded-md overflow-hidden text-center shadow relative" key={`${contact.contactId ?? 'x'}-${contact.userId ?? 'y'}`}>
+                            <div className="bg-white dark:bg-[#1c232f] rounded-md overflow-hidden text-center shadow relative" key={contact.id}>
                                 <div className="bg-white dark:bg-[#1c232f] rounded-md overflow-hidden text-center shadow relative">
                                     <div
-                                        className="bg-white/40 rounded-t-md bg-center bg-cover p-6 pb-0"
+                                        className="bg-white/40 rounded-t-md bg-center bg-cover p-6 pb-0 bg-"
                                         style={{
                                             backgroundImage: `url('/assets/images/notification-bg.png')`,
                                             backgroundRepeat: 'no-repeat',
@@ -243,13 +231,26 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                                             height: '100%',
                                         }}
                                     >
-                                        <img className="object-contain w-4/5 max-h-40 mx-auto" src={resolveImg(contact.path)} alt="contact_image" />
+                                        <img className="object-contain w-4/5 max-h-40 mx-auto" src={`${API_URL}${contact.path}`} alt="contact_image" />
                                     </div>
-
                                     <div className="px-6 pb-24 -mt-10 relative">
                                         <div className="shadow-md bg-white dark:bg-gray-900 rounded-md px-2 py-4">
                                             <div className="text-xl">{contact.name}</div>
-
+                                            <div className="text-white-dark">{contact.role}</div>
+                                            <div className="flex items-center justify-between flex-wrap mt-6 gap-3">
+                                                <div className="flex-auto">
+                                                    <div className="text-info">{contact.posts}</div>
+                                                    <div>Posts</div>
+                                                </div>
+                                                <div className="flex-auto">
+                                                    <div className="text-info">{contact.following}</div>
+                                                    <div>Following</div>
+                                                </div>
+                                                <div className="flex-auto">
+                                                    <div className="text-info">{contact.followers}</div>
+                                                    <div>Followers</div>
+                                                </div>
+                                            </div>
                                             <div className="mt-4">
                                                 <ul className="flex space-x-4 rtl:space-x-reverse items-center justify-center">
                                                     <li>
@@ -275,9 +276,25 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
                                                 </ul>
                                             </div>
                                         </div>
+                                        <div className="mt-6 grid grid-cols-1 gap-4 ltr:text-left rtl:text-right">
+                                            <div className="flex items-center">
+                                                <div className="flex-none ltr:mr-2 rtl:ml-2">Email :</div>
+                                                <div className="truncate text-white-dark">{contact.email}</div>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="flex-none ltr:mr-2 rtl:ml-2">Phone :</div>
+                                                <div className="text-white-dark">{contact.phone}</div>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="flex-none ltr:mr-2 rtl:ml-2">Address :</div>
+                                                <div className="text-white-dark">{contact.location}</div>
+                                            </div>
+                                        </div>
                                     </div>
-
                                     <div className="mt-6 flex gap-4 absolute bottom-0 w-full ltr:left-0 rtl:right-0 p-6">
+                                        <button type="button" className="btn btn-outline-primary w-1/2" onClick={() => editUser(contact)}>
+                                            Edit
+                                        </button>
                                         <button type="button" className="btn btn-outline-danger w-1/2" onClick={() => deleteUser()}>
                                             Delete
                                         </button>

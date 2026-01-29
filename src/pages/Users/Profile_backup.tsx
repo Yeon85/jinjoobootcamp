@@ -61,8 +61,6 @@ const Profile = () => {
         }
 
         try {
-
-            console.log('Fetching user details for user profileImage:', user.profileImage);
             const response = await axios.get(`${API_URL}/api/user/${user.id}`);
             console.log('유저 정보 가져오기 성공', response.data);
             setFormData((prev) => ({ ...prev, ...response.data.user }));
@@ -76,11 +74,11 @@ const Profile = () => {
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="#" className="text-primary hover:underline">
-                        사용자
+                        Users
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>프로필</span>
+                    <span>Profile</span>
                 </li>
             </ul>
             <div className="pt-5">

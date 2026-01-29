@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 import { IRootState } from '../../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { setPageTitle } from '../../store/themeConfigSlice';
 
@@ -33,12 +33,6 @@ import IconCamera from '../../components/Icon/IconCamera';
 import ApplicationConfig from '../../application';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-import { Dialog, Transition } from '@headlessui/react';
-
-//추가
-import { loginUser, logoutUser } from '@/store/userSlice';
-import IconLogout from '../../components/Icon/IconLogout';
 
 type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
 
@@ -79,7 +73,7 @@ const Chat = () => {
 
   const socketRef = useRef<Socket | null>(null);
 
-  // ✅ 기본 첫 화면: chats 탭
+  // ✅ 기본 첫 화면: chats 탭 (지아님이 원한 “처음에 이 화면 떠야 함”)
   const [tab, setTab] = useState<Tab>('chats');
 
   const [contactList, setContactList] = useState<Contact[]>([]);
@@ -90,15 +84,10 @@ const Chat = () => {
   const [isShowUserChat, setIsShowUserChat] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Contact | null>(null);
 
-  // ✅ 모바일에서 LEFT 패널 토글
+  // ✅ 모바일에서 LEFT 패널 토글(햄버거)
   const [isShowChatMenu, setIsShowChatMenu] = useState(false);
 
   const [textMessage, setTextMessage] = useState('');
-
-  // ✅ 아이디 추가 모달
-  const [isAddIdOpen, setIsAddIdOpen] = useState(false);
-  const [targetId, setTargetId] = useState('');
-  const [adding, setAdding] = useState(false);
 
   const formatDateTime = (timeString: string) => {
     if (!timeString) return '';
@@ -110,8 +99,6 @@ const Chat = () => {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-
-
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -143,80 +130,6 @@ const Chat = () => {
     } catch (e) {
       setContactList([]);
       setFilteredItems([]);
-    }
-  };
-
-  //로그아웃추가 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    dispatch(logoutUser());
-    navigate('/auth/boxed-signin');
-  };
-  
-  //프로필편집 이동 
-  const handleProfile = () => {
-   // localStorage.removeItem('user');
-    //dispatch(logoutUser());
-    navigate('/users/profile');
-  };
-
-
-  // ✅ 친구추가
-  const addFriend = async (targetUserId: number) => {
-    try {
-      await axios.post(`${API_URL}/api/contacts`, {
-        myUserId: user.id,
-        targetUserId: targetUserId,
-      });
-      alert('친구추가 완료!');
-      fetchRooms(); // 친구목록 다시 불러오기
-    } catch (e: any) {
-      console.error('친구추가 실패:', e);   
-      alert(e?.response?.data?.message || '친구추가 실패');
-    }
-  };
-
-
-   // ✅ 친구삭제
-  const delFriend = async (contactId: number) => {
-    try {
-      console.log("contactId:"+contactId);
-      await axios.delete(`${API_URL}/api/contacts/${user.id}`, {
-        data: { contactId },
-      });
-      alert('친구삭제 완료!');
-      fetchRooms(); // 친구목록 다시 불러오기
-    } catch (e: any) {
-      console.error('친구삭제 실패:', e);   
-      alert(e?.response?.data?.message || '친구삭제 실패');
-    }
-  };
-
-  const openAddIdModal = () => {
-    setTargetId('');
-    setIsAddIdOpen(true);
-  };
-
-  const closeAddIdModal = () => {
-    setIsAddIdOpen(false);
-  };
-
-  const submitAddById = async () => {
-    const idNum = Number(targetId);
-
-    //alert("idNum"+idNum);
-    //alert("user.id"+user.id);
-    if (idNum === user.id) {
-      alert('자기 자신은 친구로 추가할 수 없습니다.');
-      return;
-    }
-
-    try {
-      setAdding(true);
-      await addFriend(idNum);
-      closeAddIdModal();
-    } finally {
-      setAdding(false);
     }
   };
 
@@ -271,8 +184,8 @@ const Chat = () => {
     const keyword = searchUser.toLowerCase();
     let base: Contact[] = [];
 
-    // ✅ chats / contacts / users 는 같은 contactList 기반
-    if (tab === 'chats' || tab === 'contacts' || tab === 'users') base = contactList;
+    // ✅ chats / contacts 는 같은 contactList 기반
+    if (tab === 'chats' || tab === 'contacts') base = contactList;
     else base = [];
 
     setFilteredItems(base.filter((d) => (d.name || '').toLowerCase().includes(keyword)));
@@ -316,19 +229,21 @@ const Chat = () => {
     if (e.key === 'Enter') sendMessage();
   };
 
-  // ✅ RIGHT 패널이 보이면 안 되는 상황
+  // ✅ RIGHT 패널이 보이면 안 되는 상황:
+  // 1) tab === 'contacts' (연락처는 빨간 박스(LEFT) 안에만!)
+  // 2) isShowUserChat === false (모바일에서는 오른쪽 빈화면 안보이게)
   const hideRightPanel = tab === 'contacts' || (!isShowUserChat && window.innerWidth < 1280);
 
   return (
     <div>
-      <div className={`relative flex items-stretch gap-5 h-[calc(100vh_-_150px)] min-h-[calc(100vh_-_150px)] ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
+      <div className={`flex gap-5 relative sm:h-[calc(100vh_-_150px)] h-full sm:min-h-0 ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
         {/* LEFT */}
         <div
-          className={`panel p-0 flex flex-col flex-none max-w-xs w-full absolute top-0 xl:relative z-10 overflow-hidden h-full min-h-0
-            ${(!isShowUserChat || isShowChatMenu || tab === 'contacts' || tab === 'users') ? 'block' : 'hidden'} xl:block
+          className={`panel p-0 flex-none max-w-xs w-full absolute xl:relative z-10 space-y-4 overflow-hidden
+            ${(!isShowUserChat || isShowChatMenu || tab === 'contacts') ? 'block' : 'hidden'} xl:block
           `}
         >
-          <div className="p-4 flex flex-col h-full min-h-0">
+          <div className="p-4">
             {/* header */}
             <div className="flex justify-between items-center">
               <div className="flex items-center">
@@ -350,11 +265,10 @@ const Chat = () => {
                 >
                   <ul className="whitespace-nowrap">
                     <li>
-                        <button type="button"onClick={handleProfile} className="w-full flex items-center px-4 !py-3"  >
-                          <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                          프로필 편집
-                        </button>
-            
+                      <button type="button">
+                        <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
+                        Settings
+                      </button>
                     </li>
                     <li>
                       <button type="button">
@@ -363,10 +277,10 @@ const Chat = () => {
                       </button>
                     </li>
                     <li>
-                       <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
-                                            <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
-                                            로그아웃
-                                        </button>
+                      <button type="button">
+                        <IconLogin className="ltr:mr-1 rtl:ml-1 shrink-0" />
+                        Sign Out
+                      </button>
                     </li>
                   </ul>
                 </Dropdown>
@@ -389,21 +303,18 @@ const Chat = () => {
 
             {/* tabs */}
             <div className="flex justify-between items-center text-xs mt-4">
-              <button
-                type="button"
-                className={`hover:text-primary ${tab === 'users' ? 'text-primary' : ''}`}
-                onClick={() => {
-                  setTab('users');
-                  setIsShowUserChat(false);
-                  setSelectedUser(null);
-                  setIsShowChatMenu(false);
-                }}
-              >
+              <button type="button" className={`hover:text-primary ${tab === 'users' ? 'text-primary' : ''}`} onClick={() => setTab('users')}>
                 <IconUser className="mx-auto mb-1" />
                 사용자
               </button>
 
-              <button type="button" className={`hover:text-primary ${tab === 'chats' ? 'text-primary' : ''}`} onClick={() => setTab('chats')}>
+              <button
+                type="button"
+                className={`hover:text-primary ${tab === 'chats' ? 'text-primary' : ''}`}
+                onClick={() => {
+                  setTab('chats');
+                }}
+              >
                 <IconMessagesDot className="mx-auto mb-1" />
                 채팅
               </button>
@@ -413,6 +324,7 @@ const Chat = () => {
                 전화
               </button>
 
+              {/* ✅ 연락처 탭: 오른쪽(뒤) 화면 절대 안뜸. 빨간 박스 리스트만 바뀜 */}
               <button
                 type="button"
                 className={`hover:text-primary ${tab === 'contacts' ? 'text-primary' : ''}`}
@@ -435,21 +347,12 @@ const Chat = () => {
 
             <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]" />
 
-            {/* ✅ 연락처 탭에서만 아이디 추가 버튼 */}
-            {tab === 'contacts' && (
-              <div className="mt-3">
-                <button type="button" className="btn w-full btn-primary" onClick={openAddIdModal}>
-                  <IconUserPlus className="mr-2" /> 친구 추가
-                </button>
-              </div>
-            )}
-
-            {/* LIST */}
-            <div className="!mt-0 flex-1 min-h-0">
-              <PerfectScrollbar className="chat-users relative h-full space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
-                {/* CHATS */}
-                {tab === 'chats' &&
-                  (filteredItems.length > 0 ? (
+            {/* ✅ LIST 영역: "내용 기반 높이 + max-height 스크롤" */}
+            <div className="!mt-0">
+              <PerfectScrollbar className="chat-users relative max-h-[55vh] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
+                {/* ✅ CHATS 리스트 */}
+                {tab === 'chats' && (
+                  filteredItems.length > 0 ? (
                     filteredItems.map((person: Contact) => (
                       <div key={`${person.contactId}-${person.userId}`}>
                         <button
@@ -471,12 +374,11 @@ const Chat = () => {
                               </div>
                               <div className="mx-3 ltr:text-left rtl:text-right">
                                 <p className="mb-1 font-semibold">{person.name}</p>
-                                <p className="text-xs text-white-dark truncate max-w-[185px]">
-                                  {person.preview || person.messages?.[person.messages.length - 1]?.text || ''}
-                                </p>
+                                <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview}</p>
                               </div>
                             </div>
                           </div>
+
                           <div className="font-semibold whitespace-nowrap text-xs">
                             <p>{formatDateTime(person.time)}</p>
                           </div>
@@ -485,41 +387,12 @@ const Chat = () => {
                     ))
                   ) : (
                     <div className="text-center text-gray-400 p-4">No chats</div>
-                  ))}
+                  )
+                )}
 
-                {/* CONTACTS */}
-                {tab === 'contacts' &&
-                  (filteredItems.length > 0 ? (
-                    filteredItems.map((c: Contact) => (
-                      <div key={`${c.contactId}-${c.userId}`}>
-                        <div className="w-full flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md">
-                          <div className="flex items-center gap-3">
-                            <img src={resolveImg(c.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
-                            <div className="ltr:text-left rtl:text-right">
-                              <p className="font-semibold">{c.name}</p>
-                              <p className="text-xs text-white-dark">ID: {c.userId}</p>
-                            </div>
-                          </div>
-<div className="flex items-center gap-2"></div>
-                          <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => selectUser(c)}>
-                            Chat
-                          </button>
-
-                         {/*  <button type="button" className="btn btn-sm btn-outline-success" onClick={() => addFriend(c.userId)}>
-                          */} <button type="button" className="btn btn-sm btn-outline-success" onClick={() => delFriend(c.contactId)}>
-                            친구삭제
-                          </button>
-</div>
-                        </div>
-          
-                    ))
-                  ) : (
-                    <div className="text-center text-gray-400 p-4">No contacts</div>
-                  ))}
-
-                {/* USERS */}
-                {tab === 'users' &&
-                  (filteredItems.length > 0 ? (
+                {/* ✅ CONTACTS 리스트: 빨간 박스 안에서만 */}
+                {tab === 'contacts' && (
+                  filteredItems.length > 0 ? (
                     filteredItems.map((c: Contact) => (
                       <div key={`${c.contactId}-${c.userId}`}>
                         <div className="w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md">
@@ -527,38 +400,42 @@ const Chat = () => {
                             <img src={resolveImg(c.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
                             <div className="ltr:text-left rtl:text-right">
                               <p className="font-semibold">{c.name}</p>
-                              <p className="text-xs text-white-dark">ID: {c.userId}</p>
+                              <p className="text-xs text-white-dark">UserID: {c.userId}</p>
                             </div>
                           </div>
 
-                          <button type="button" className="btn btn-sm btn-outline-success" onClick={() => addFriend(c.userId)}>
-                            친구추가
+                          <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => selectUser(c)}>
+                            Chat
                           </button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-gray-400 p-4">No users</div>
-                  ))}
+                    <div className="text-center text-gray-400 p-4">No contacts</div>
+                  )
+                )}
 
-                {/* OTHERS */}
-                {(tab === 'calls' || tab === 'noti') && <div className="text-center text-gray-400 p-4">Not implemented yet</div>}
+                {/* 나머지 탭 */}
+                {(tab === 'users' || tab === 'calls' || tab === 'noti') && (
+                  <div className="text-center text-gray-400 p-4">Not implemented yet</div>
+                )}
               </PerfectScrollbar>
             </div>
           </div>
         </div>
 
-        {/* overlay */}
+        {/* overlay (모바일 메뉴 열렸을 때만) */}
         <div
           className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`}
           onClick={() => setIsShowChatMenu(false)}
         />
 
-        {/* RIGHT */}
+        {/* RIGHT (채팅방) */}
         {!hideRightPanel && (
           <div className="panel p-0 flex-1">
             {!isShowUserChat && (
               <div className="flex items-center justify-center h-full relative p-4">
+                {/* 모바일 메뉴 버튼 */}
                 <button type="button" onClick={() => setIsShowChatMenu(!isShowChatMenu)} className="xl:hidden absolute top-4 ltr:left-4 rtl:right-4 hover:text-primary">
                   <IconBack />
                 </button>
@@ -577,6 +454,7 @@ const Chat = () => {
                 {/* top bar */}
                 <div className="flex justify-between items-center p-4">
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    {/* 모바일 뒤로 */}
                     <button
                       type="button"
                       className="xl:hidden hover:text-primary"
@@ -644,7 +522,7 @@ const Chat = () => {
                           <li>
                             <button type="button">
                               <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              프로필 편집
+                              Settings
                             </button>
                           </li>
                         </ul>
@@ -683,7 +561,9 @@ const Chat = () => {
                                     </div>
                                   </div>
 
-                                  <div className={`text-xs text-white-dark ${isMine ? 'ltr:text-right rtl:text-left' : ''}`}>{message.time ? formatDateTime(message.time) : ''}</div>
+                                  <div className={`text-xs text-white-dark ${isMine ? 'ltr:text-right rtl:text-left' : ''}`}>
+                                    {message.time ? formatDateTime(message.time) : ''}
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -737,55 +617,6 @@ const Chat = () => {
             )}
           </div>
         )}
-
-        {/* ✅ 아이디 추가 모달 */}
-        <Transition appear show={isAddIdOpen} as={Fragment}>
-          <Dialog as="div" className="relative z-[999]" onClose={closeAddIdModal}>
-            <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100" leaveTo="opacity-0">
-              <div className="fixed inset-0 bg-black/60" />
-            </Transition.Child>
-
-            <div className="fixed inset-0 overflow-y-auto">
-              <div className="flex min-h-full items-center justify-center p-4">
-                <Transition.Child
-                  as={Fragment}
-                  enter="ease-out duration-200"
-                  enterFrom="opacity-0 scale-95"
-                  enterTo="opacity-100 scale-100"
-                  leave="ease-in duration-150"
-                  leaveFrom="opacity-100 scale-100"
-                  leaveTo="opacity-0 scale-95"
-                >
-                  <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-[#0E1726]">
-                    <Dialog.Title className="text-lg font-bold mb-4">아이디로 친구 추가</Dialog.Title>
-
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        placeholder="친구 아이디 입력"
-                        value={targetId}
-                        onChange={(e) => setTargetId(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') submitAddById();
-                        }}
-                      />
-
-                      <div className="flex justify-end gap-2">
-                        <button type="button" className="btn btn-outline-danger" onClick={closeAddIdModal} disabled={adding}>
-                          취소
-                        </button>
-                        <button type="button" className="btn btn-primary" onClick={submitAddById} disabled={adding}>
-                          {adding ? '추가중...' : '추가'}
-                        </button>
-                      </div>
-                    </div>
-                  </Dialog.Panel>
-                </Transition.Child>
-              </div>
-            </div>
-          </Dialog>
-        </Transition>
       </div>
     </div>
   );
