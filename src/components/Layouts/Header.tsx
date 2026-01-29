@@ -496,7 +496,7 @@ const Header = () => {
                                     <li>
                                         <Link to="/users/profile" className="dark:hover:text-white">
                                             <IconUser className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            프로필
+                                            Profile
                                         </Link>
                                     </li>
                                     <li>
@@ -508,13 +508,13 @@ const Header = () => {
                                     <li>
                                         <Link to="/auth/boxed-lockscreen" className="dark:hover:text-white">
                                             <IconLockDots className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            잠금화면
+                                            Lock Screen
                                         </Link>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
                                         <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
-                                            <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
-                                            로그아웃
+                                            <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
+                                            Sign Out
                                         </button>
                                     </li>
                                 </ul>

@@ -37,7 +37,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 //추가
-import { loginUser, logoutUser } from '@/store/userSlice';
+import { logoutUser } from '@/store/userSlice';
 import IconLogout from '../../components/Icon/IconLogout';
 
 type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
@@ -68,7 +68,7 @@ const Chat = () => {
   const API_URL = ApplicationConfig.API_URL;
   const user = useSelector((state: IRootState) => state.user);
 
-  const loginUser = {
+  const loginUserObj = {
     id: user.id,
     name: user.name,
     path: user.profileImage,
@@ -111,8 +111,6 @@ const Chat = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
-
-
   const scrollToBottom = () => {
     setTimeout(() => {
       const element: any = document.querySelector('.chat-conversation-box');
@@ -146,20 +144,17 @@ const Chat = () => {
     }
   };
 
-  //로그아웃추가 
+  //로그아웃추가
   const handleLogout = () => {
     localStorage.removeItem('user');
     dispatch(logoutUser());
     navigate('/auth/boxed-signin');
   };
-  
-  //프로필편집 이동 
-  const handleProfile = () => {
-   // localStorage.removeItem('user');
-    //dispatch(logoutUser());
-    navigate('/users/profile');
-  };
 
+  //프로필편집 이동
+  const handleProfile = () => {
+    navigate('/auth/boxed-signin');
+  };
 
   // ✅ 친구추가
   const addFriend = async (targetUserId: number) => {
@@ -171,23 +166,21 @@ const Chat = () => {
       alert('친구추가 완료!');
       fetchRooms(); // 친구목록 다시 불러오기
     } catch (e: any) {
-      console.error('친구추가 실패:', e);   
+      console.error('친구추가 실패:', e);
       alert(e?.response?.data?.message || '친구추가 실패');
     }
   };
 
-
-   // ✅ 친구삭제
+  // ✅ 친구삭제
   const delFriend = async (contactId: number) => {
     try {
-      console.log("contactId:"+contactId);
       await axios.delete(`${API_URL}/api/contacts/${user.id}`, {
         data: { contactId },
       });
       alert('친구삭제 완료!');
       fetchRooms(); // 친구목록 다시 불러오기
     } catch (e: any) {
-      console.error('친구삭제 실패:', e);   
+      console.error('친구삭제 실패:', e);
       alert(e?.response?.data?.message || '친구삭제 실패');
     }
   };
@@ -202,23 +195,32 @@ const Chat = () => {
   };
 
   const submitAddById = async () => {
-    const idNum = Number(targetId);
+  const targetUserId = targetId.trim();
+  if (!targetUserId) {
+    alert('아이디를 입력하세요.');
+    return;
+  }
 
-    //alert("idNum"+idNum);
-    //alert("user.id"+user.id);
-    if (idNum === user.id) {
-      alert('자기 자신은 친구로 추가할 수 없습니다.');
-      return;
-    }
+  try {
+    setAdding(true);
 
-    try {
-      setAdding(true);
-      await addFriend(idNum);
-      closeAddIdModal();
-    } finally {
-      setAdding(false);
-    }
-  };
+    // ✅ 문자열 아이디 그대로 전송
+    await axios.post(`${API_URL}/api/contacts`, {
+      myUserId: user.id,
+      targetUserId: targetUserId, // ✅ 핵심
+    });
+
+    alert('친구추가 완료!');
+    fetchRooms();
+    closeAddIdModal();
+  } catch (e: any) {
+    console.error(e);
+    alert(e?.response?.data?.message || '친구추가 실패');
+  } finally {
+    setAdding(false);
+  }
+};
+
 
   // 로그인/초기 진입
   useEffect(() => {
@@ -297,7 +299,7 @@ const Chat = () => {
 
     const payload = {
       contactId,
-      fromUserId: loginUser.id,
+      fromUserId: loginUserObj.id,
       toUserId: selectedUser.userId,
       text: textMessage,
     };
@@ -312,8 +314,12 @@ const Chat = () => {
     }
   };
 
-  const sendMessageHandle = (e: any) => {
-    if (e.key === 'Enter') sendMessage();
+  // ✅ Enter 전송 (Shift+Enter는 무시 / IME 안정)
+  const sendMessageHandle = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   // ✅ RIGHT 패널이 보이면 안 되는 상황
@@ -333,7 +339,7 @@ const Chat = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className="flex-none">
-                  <img src={resolveImg(loginUser.path)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
+                  <img src={resolveImg(loginUserObj.path)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
                 </div>
                 <div className="mx-3">
                   <p className="mb-1 font-semibold">{user.name}</p>
@@ -350,11 +356,10 @@ const Chat = () => {
                 >
                   <ul className="whitespace-nowrap">
                     <li>
-                        <button type="button"onClick={handleProfile} className="w-full flex items-center px-4 !py-3"  >
-                          <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                          프로필 편집
-                        </button>
-            
+                      <button type="button" onClick={handleProfile} className="w-full flex items-center px-4 !py-3">
+                        <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
+                        프로필 편집
+                      </button>
                     </li>
                     <li>
                       <button type="button">
@@ -363,10 +368,10 @@ const Chat = () => {
                       </button>
                     </li>
                     <li>
-                       <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
-                                            <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
-                                            로그아웃
-                                        </button>
+                      <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
+                        <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
+                        로그아웃
+                      </button>
                     </li>
                   </ul>
                 </Dropdown>
@@ -471,9 +476,7 @@ const Chat = () => {
                               </div>
                               <div className="mx-3 ltr:text-left rtl:text-right">
                                 <p className="mb-1 font-semibold">{person.name}</p>
-                                <p className="text-xs text-white-dark truncate max-w-[185px]">
-                                  {person.preview || person.messages?.[person.messages.length - 1]?.text || ''}
-                                </p>
+                                <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview || person.messages?.[person.messages.length - 1]?.text || ''}</p>
                               </div>
                             </div>
                           </div>
@@ -500,18 +503,16 @@ const Chat = () => {
                               <p className="text-xs text-white-dark">ID: {c.userId}</p>
                             </div>
                           </div>
-<div className="flex items-center gap-2"></div>
-                          <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => selectUser(c)}>
-                            Chat
-                          </button>
-
-                         {/*  <button type="button" className="btn btn-sm btn-outline-success" onClick={() => addFriend(c.userId)}>
-                          */} <button type="button" className="btn btn-sm btn-outline-success" onClick={() => delFriend(c.contactId)}>
-                            친구삭제
-                          </button>
-</div>
+                          <div className="flex items-center gap-2">
+                            <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => selectUser(c)}>
+                              Chat
+                            </button>
+                            <button type="button" className="btn btn-sm btn-outline-success" onClick={() => delFriend(c.contactId)}>
+                              친구삭제
+                            </button>
+                          </div>
                         </div>
-          
+                      </div>
                     ))
                   ) : (
                     <div className="text-center text-gray-400 p-4">No contacts</div>
@@ -549,10 +550,7 @@ const Chat = () => {
         </div>
 
         {/* overlay */}
-        <div
-          className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`}
-          onClick={() => setIsShowChatMenu(false)}
-        />
+        <div className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`} onClick={() => setIsShowChatMenu(false)} />
 
         {/* RIGHT */}
         {!hideRightPanel && (
@@ -661,12 +659,12 @@ const Chat = () => {
                     {selectedUser.messages && selectedUser.messages.length ? (
                       <>
                         {selectedUser.messages.map((message: Message, index: number) => {
-                          const isMine = message.fromUserId === loginUser.id;
+                          const isMine = message.fromUserId === loginUserObj.id;
                           return (
                             <div key={`${message.time}-${index}`}>
                               <div className={`flex items-start gap-3 ${isMine ? 'justify-end' : ''}`}>
                                 <div className={`flex-none ${isMine ? 'order-2' : ''}`}>
-                                  <img src={isMine ? resolveImg(loginUser.path) : resolveImg(selectedUser.path)} className="rounded-full h-10 w-10 object-cover" alt="" />
+                                  <img src={isMine ? resolveImg(loginUserObj.path) : resolveImg(selectedUser.path)} className="rounded-full h-10 w-10 object-cover" alt="" />
                                 </div>
 
                                 <div className="space-y-2">
@@ -705,7 +703,7 @@ const Chat = () => {
                         placeholder="메세지를 입력하세요"
                         value={textMessage}
                         onChange={(e: any) => setTextMessage(e.target.value)}
-                        onKeyUp={sendMessageHandle}
+                        onKeyDown={sendMessageHandle}
                       />
                       <button type="button" className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 hover:text-primary">
                         <IconMoodSmile />
