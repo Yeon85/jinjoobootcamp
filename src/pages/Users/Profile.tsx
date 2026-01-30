@@ -23,6 +23,10 @@ import axios from 'axios';
 import { useState,useEffect } from 'react';
 import ApplicationConfig from '../../application';
 
+//추가
+import IconBack from '../../components/Icon/IconBack';
+import { useNavigate } from 'react-router-dom';
+
 const Profile = () => {
     const dispatch = useDispatch();
     const API_URL = ApplicationConfig.API_URL;
@@ -53,7 +57,7 @@ const Profile = () => {
 
     console.log(user); // ✅ Redux user 확인하기
 
-
+    const navigate = useNavigate();
     const fetchUserDetails = async () => {
         if (!user?.id) {
             console.error('유저 ID가 없습니다.');
@@ -74,6 +78,13 @@ const Profile = () => {
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
+            <button
+                      type="button"
+                      className="xl:hidden hover:text-primary flex-none"
+                      onClick={() => navigate('/apps/chat')}
+                    >
+                      <IconBack />
+                    </button>
                 <li>
                     <Link to="#" className="text-primary hover:underline">
                         사용자

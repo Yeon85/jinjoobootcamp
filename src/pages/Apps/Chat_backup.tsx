@@ -25,6 +25,9 @@ import IconTrashLines from '../../components/Icon/IconTrashLines';
 import IconShare from '../../components/Icon/IconShare';
 import IconMoodSmile from '../../components/Icon/IconMoodSmile';
 import IconSend from '../../components/Icon/IconSend';
+import IconMicrophoneOff from '../../components/Icon/IconMicrophoneOff';
+import IconDownload from '../../components/Icon/IconDownload';
+import IconCamera from '../../components/Icon/IconCamera';
 
 import ApplicationConfig from '../../application';
 import axios from 'axios';
@@ -40,7 +43,7 @@ type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
 
 type Message = {
   contactId: number;
-  fromUserId: string;
+  fromUserId: string; // ✅ 서버가 nameId 또는 id(숫자)를 문자열로 줄 수도 있음
   toUserId: string;
   text: string;
   time: string;
@@ -48,9 +51,9 @@ type Message = {
 
 type Contact = {
   contactId: number;
-  userId: string; // 상대 아이디(nameId)
+  userId: string; // ✅ 상대 아이디(nameId)
   name: string;
-  nameId?: string;
+  nameId?: string; // 서버가 주면 쓰고 아니면 무시
   path?: string;
   active: number | boolean;
   time: string;
@@ -103,64 +106,12 @@ const Chat = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
-  const formatChatTime = (iso?: string) => {
-  if (!iso) return '';
-
-  const date = new Date(iso);
-  const now = new Date();
-
-  const isToday =
-    date.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' }) ===
-    now.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
-
-  if (isToday) {
-    return date.toLocaleTimeString('ko-KR', {
-      timeZone: 'Asia/Seoul',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
-
-  return date.toLocaleDateString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
-
   const scrollToBottom = () => {
     setTimeout(() => {
       const el = document.querySelector('.chat-conversation-box') as HTMLElement | null;
       if (el) el.scrollTop = el.scrollHeight;
     }, 50);
   };
-
-
-const parseMysqlKST = (s?: string) => {
-  if (!s) return null;
-
-  // 이미 ISO(예: 2026-01-30T00:12:58.000Z, 2026-01-30T09:12:58+09:00)면 그대로
-  if (s.includes('T')) return new Date(s);
-
-  // MySQL "YYYY-MM-DD HH:mm:ss" 를 KST(+09:00)로 확정해서 파싱
-  return new Date(s.replace(' ', 'T') + '+09:00');
-};
-
-const formatKST = (s?: string) => {
-  const d = parseMysqlKST(s);
-  if (!d) return '';
-  return new Date(d).toLocaleString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-};
-
 
   const resolveImg = (p?: string) => {
     if (!p) return `/assets/images/profile-35.png`;
@@ -169,56 +120,26 @@ const formatKST = (s?: string) => {
     return `/assets/images/${p}`;
   };
 
-  // ✅ 핵심: snake_case / camelCase 어떤 메시지가 와도 통일
-  const normalizeMessage = (m: any): Message => {
-    return {
-      contactId: Number(m.contactId ?? m.contact_id ?? 0),
-      fromUserId: String(m.fromUserId ?? m.from_user_id ?? m.from ?? ''),
-      toUserId: String(m.toUserId ?? m.to_user_id ?? m.to ?? ''),
-      text: String(m.text ?? m.message ?? ''),
-      time: String(m.time ?? m.created_at ?? m.createdAt ?? ''),
-    };
-  };
-
-  const normalizeContact = (c: any): Contact => {
-    const msgsRaw = Array.isArray(c.messages) ? c.messages : [];
-    const msgs = msgsRaw.map(normalizeMessage);
-
-    return {
-      ...c,
-      contactId: Number(c.contactId ?? c.contact_id ?? 0),
-      userId: String(c.userId ?? c.nameId ?? ''),
-      name: String(c.name ?? ''),
-      nameId: c.nameId ? String(c.nameId) : undefined,
-      path: c.path,
-      active: c.active ?? 0,
-      time: String(c.time ?? ''),
-      preview: c.preview ?? msgs[msgs.length - 1]?.text ?? '',
-      messages: msgs,
-    };
-  };
-
   const fetchRooms = async () => {
     if (!user?.nameId) return;
     try {
       const res = await axios.get(`${API_URL}/api/contacts/${user.nameId}`);
       const contacts: any[] = res.data?.contacts;
 
-      if (Array.isArray(contacts)) {
-        const normalized = contacts.map(normalizeContact);
-        setContactList(normalized);
-        setFilteredItems(normalized);
+   if (Array.isArray(contacts)) {
+  const normalized = contacts.map((c: any) => ({
+    ...c,
+    userId: String(c.userId ?? c.nameId ?? ''),
+    nameId: c.nameId ? String(c.nameId) : undefined,
+    messages: Array.isArray(c.messages) ? c.messages : [],
+  }));
 
-        // 선택된 유저가 있으면 최신 객체로 갱신
-        setSelectedUser((prev) => {
-          if (!prev) return prev;
-          const found = normalized.find((x) => x.contactId === prev.contactId);
-          return found ?? prev;
-        });
-      } else {
-        setContactList([]);
-        setFilteredItems([]);
-      }
+  setContactList(normalized);
+  setFilteredItems(normalized);
+} else {
+  setContactList([]);
+  setFilteredItems([]);
+}
     } catch (e) {
       setContactList([]);
       setFilteredItems([]);
@@ -239,9 +160,9 @@ const formatKST = (s?: string) => {
   const addFriend = async (targetUserId: string) => {
     try {
       await axios.post(`${API_URL}/api/contacts`, {
-        myUserId: user.id,
-        nameId: user.nameId,
-        targetUserId,
+        myUserId: user.id, // 서버가 필요하면 유지
+        nameId: user.nameId, // ✅ 내 아이디(nameId)
+        targetUserId, // ✅ 상대 아이디
       });
 
       alert('친구추가 완료!');
@@ -288,6 +209,7 @@ const formatKST = (s?: string) => {
         targetUserId,
       });
 
+      
       alert('친구추가 완료!');
       fetchRooms();
       closeAddIdModal();
@@ -315,6 +237,7 @@ const formatKST = (s?: string) => {
     fetchRooms();
 
     return () => {
+      // 필요하면 연결 끊기
       // socketRef.current?.disconnect();
       // socketRef.current = null;
     };
@@ -326,67 +249,28 @@ const formatKST = (s?: string) => {
     const socket = socketRef.current;
     if (!socket) return;
 
-    const onNewMessage = (raw: any) => {
-  let msg = normalizeMessage(raw);
+    const onNewMessage = (msg: Message) => {
+      setContactList((prev) =>
+        prev.map((c) =>
+          c.contactId === msg.contactId
+            ? { ...c, messages: [...(c.messages || []), msg], preview: msg.text, time: msg.time }
+            : c
+        )
+      );
 
-  const myNameId = String(user.nameId ?? '');
+      setSelectedUser((prev) => {
+        if (!prev) return prev;
+        if (prev.contactId !== msg.contactId) return prev;
+        return { ...prev, messages: [...(prev.messages || []), msg], preview: msg.text, time: msg.time };
+      });
 
-  // ✅ 1) fromUserId 보정
-  if (!msg.fromUserId) {
-    // raw에 있으면 우선 사용
-    if (raw.fromUserId) {
-      msg.fromUserId = String(raw.fromUserId);
-    } else {
-      // 없으면 "나"가 보낸 걸로 간주
-      msg.fromUserId = myNameId;
-    }
-  }
-
-  // ✅ 2) toUserId 보정
-  if (!msg.toUserId) {
-    if (raw.toUserId) {
-      msg.toUserId = String(raw.toUserId);
-    } else if (selectedUser && selectedUser.contactId === msg.contactId) {
-      // 현재 열린 방이면 상대는 무조건 selectedUser
-      msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
-    }
-  }
-
-  // ✅ 3) 최종 안전장치 (둘 중 하나라도 없으면 반대편으로 채움)
-  if (!msg.toUserId && msg.fromUserId === myNameId && selectedUser) {
-    msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
-  }
-
-  // 🔍 디버그 (문제 해결될 때까지만)
-  console.log('>>> newMessage FINAL', {
-    from: msg.fromUserId,
-    to: msg.toUserId,
-    text: msg.text,
-    time: msg.time,
-  });
-
-  // === 상태 반영 ===
-  setContactList((prev) =>
-    prev.map((c) =>
-      c.contactId === msg.contactId
-        ? { ...c, messages: [...(c.messages || []), msg], preview: msg.text, time: msg.time }
-        : c
-    )
-  );
-
-  setSelectedUser((prev) => {
-    if (!prev) return prev;
-    if (prev.contactId !== msg.contactId) return prev;
-    return { ...prev, messages: [...(prev.messages || []), msg], preview: msg.text, time: msg.time };
-  });
-};
-
+      scrollToBottom();
+    };
 
     socket.on('newMessage', onNewMessage);
     return () => {
       socket.off('newMessage', onNewMessage);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ✅ 검색 + 탭별 리스트
@@ -412,21 +296,22 @@ const formatKST = (s?: string) => {
     scrollToBottom();
   };
 
-  // ✅ 메시지 전송 (완성본)
+  // ✅ 메시지 전송 (fromUserId = 내 nameId)
   const sendMessage = async () => {
     if (!textMessage.trim() || !selectedUser) return;
 
-    const to = String(selectedUser.userId ?? selectedUser.nameId ?? '');
+//const to = String(selectedUser.nameId ?? selectedUser.userId);
 
-    const payload = {
-      contactId: selectedUser.contactId,
-      fromUserId: String(user.nameId ?? ''), // ✅ 내 nameId
-      toUserId: to, // ✅ 상대 nameId
-      text: textMessage.trim(),
-    };
+const to = String(selectedUser.userId ?? selectedUser.nameId ?? '');
 
-    console.log('✅ [SEND payload]', payload);
 
+
+ const payload = {
+  contactId: selectedUser.contactId,
+  fromUserId: String(user.nameId),   // 무조건 내 nameId(문자)
+  toUserId: to,                      // 상대도 nameId 우선
+  text: textMessage.trim(),
+};
     try {
       await axios.post(`${API_URL}/api/messages`, payload);
       setTextMessage('');
@@ -444,38 +329,6 @@ const formatKST = (s?: string) => {
     }
   };
 
-
-  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-
-const isDifferentDay = (prev?: string, curr?: string) => {
-  if (!prev || !curr) return true;
-  return new Date(prev).toDateString() !== new Date(curr).toDateString();
-};
-
-// ✅ 날짜 구분선: 오늘/어제/그 외 날짜
-const formatDateDivider = (iso: string) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-
-  const today = startOfDay(new Date());
-  const msgDay = startOfDay(d);
-
-  const diffDays = Math.round((today.getTime() - msgDay.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return '오늘';
-  if (diffDays === 1) return '어제';
-
-  return d.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
-
-
-
-  
   // ✅ RIGHT 패널 숨김 조건
   const hideRightPanel = tab === 'contacts' || (!isShowUserChat && !isDesktopXL);
 
@@ -634,12 +487,14 @@ const formatDateDivider = (iso: string) => {
                               </div>
                               <div className="mx-3 ltr:text-left rtl:text-right">
                                 <p className="mb-1 font-semibold">{person.name}</p>
-                                <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview || person.messages?.[person.messages.length - 1]?.text || ''}</p>
+                                <p className="text-xs text-white-dark truncate max-w-[185px]">
+                                  {person.preview || person.messages?.[person.messages.length - 1]?.text || ''}
+                                </p>
                               </div>
                             </div>
                           </div>
                           <div className="font-semibold whitespace-nowrap text-xs">
-                            <p>{formatChatTime(person.time)}</p>
+                            <p>{formatDateTime(person.time)}</p>
                           </div>
                         </button>
                       </div>
@@ -709,196 +564,190 @@ const formatDateDivider = (iso: string) => {
         {/* overlay */}
         <div className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`} onClick={() => setIsShowChatMenu(false)} />
 
-        {/* RIGHT */}
-        {!hideRightPanel && (
-          <div className="panel p-0 flex-1 min-w-0">
-            {!isShowUserChat && (
-              <div className="flex items-center justify-center h-full relative p-4">
-                <button type="button" onClick={() => setIsShowChatMenu(!isShowChatMenu)} className="xl:hidden absolute top-4 ltr:left-4 rtl:right-4 hover:text-primary">
-                  <IconBack />
-                </button>
+   {/* RIGHT */}
+{!hideRightPanel && (
+  <div className="panel p-0 flex-1 min-w-0">
+    {!isShowUserChat && (
+      <div className="flex items-center justify-center h-full relative p-4">
+        <button
+          type="button"
+          onClick={() => setIsShowChatMenu(!isShowChatMenu)}
+          className="xl:hidden absolute top-4 ltr:left-4 rtl:right-4 hover:text-primary"
+        >
+          <IconBack />
+        </button>
 
-                <div className="py-8 flex items-center justify-center flex-col">
-                  <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[220px] mx-auto">
-                    <IconMessage className="ltr:mr-2 rtl:ml-2" />
-                    Click User To Chat
-                  </p>
+        <div className="py-8 flex items-center justify-center flex-col">
+          <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[220px] mx-auto">
+            <IconMessage className="ltr:mr-2 rtl:ml-2" />
+            Click User To Chat
+          </p>
+        </div>
+      </div>
+    )}
+
+    {isShowUserChat && selectedUser ? (
+      // ✅ 핵심: flex-col + min-h-0 + 메시지영역 flex-1
+      <div className="flex flex-col h-full min-h-0">
+        {/* top bar */}
+        <div className="flex justify-between items-center p-4 flex-none">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0">
+            <button
+              type="button"
+              className="xl:hidden hover:text-primary flex-none"
+              onClick={() => {
+                setIsShowUserChat(false);
+                setSelectedUser(null);
+              }}
+            >
+              <IconBack />
+            </button>
+
+            <div className="relative flex-none">
+              <img
+                src={resolveImg(selectedUser.path)}
+                className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover"
+                alt=""
+              />
+              {!!selectedUser.active && (
+                <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
+                  <div className="w-3.5 h-3.5 bg-success rounded-full border-2 border-white dark:border-[#0E1726]" />
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {isShowUserChat && selectedUser ? (
-              <div className="flex flex-col h-full min-h-0">
-                {/* top bar */}
-                <div className="flex justify-between items-center p-4 flex-none">
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0">
-                    <button
-                      type="button"
-                      className="xl:hidden hover:text-primary flex-none"
-                      onClick={() => {
-                        setIsShowUserChat(false);
-                        setSelectedUser(null);
-                      }}
-                    >
-                      <IconBack />
-                    </button>
-
-                    <div className="relative flex-none">
-                      <img src={resolveImg(selectedUser.path)} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" />
-                      {!!selectedUser.active && (
-                        <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
-                          <div className="w-3.5 h-3.5 bg-success rounded-full border-2 border-white dark:border-[#0E1726]" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mx-3 min-w-0">
-                      <p className="font-semibold truncate">{selectedUser.name}</p>
-                      <p className="text-white-dark text-xs truncate">{selectedUser.active ? 'Active now' : `마지막 접속: ${formatDateTime(selectedUser.time)}`}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex sm:gap-5 gap-3 flex-none">
-                    <button type="button">
-                      <IconPhoneCall className="hover:text-primary" />
-                    </button>
-                    <button type="button">
-                      <IconVideo className="w-5 h-5 hover:text-primary" />
-                    </button>
-
-                    <div className="dropdown">
-                      <Dropdown
-                        placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                        btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center"
-                        button={<IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />}
-                      >
-                        <ul className="text-black dark:text-white-dark">
-                          <li>
-                            <button type="button">
-                              <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                              검색
-                            </button>
-                          </li>
-                          <li>
-                            <button type="button">
-                              <IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              복사
-                            </button>
-                          </li>
-                          <li>
-                            <button type="button">
-                              <IconTrashLines className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              삭제
-                            </button>
-                          </li>
-                          <li>
-                            <button type="button">
-                              <IconShare className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              동기화
-                            </button>
-                          </li>
-                          <li>
-                            <button type="button" onClick={handleProfile} > 
-                              <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                              프로필
-                            </button>
-                          </li>
-                        </ul>
-                      </Dropdown>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b] flex-none" />
-
-                {/* conversation */}
-                <div className="flex-1 min-h-0">
-                  <PerfectScrollbar className="chat-conversation-box h-full">
-                    {selectedUser.messages?.length ? (
-                      selectedUser.messages.map((raw: any, index: number) => {
-                        const message = normalizeMessage(raw);
-
-                        console.log('>>>> raw message:', raw);
-  console.log('📨 socket raw time:', raw.time, raw.created_at);
-  console.log('📨 socket raw time:', raw.time, raw.createdAt);
-                        const fromId = String(message.fromUserId ?? '');
-                        const toId = String(message.toUserId ?? '');
-                        const isMine = myIds.has(fromId);
-
-                        // ✅ 첫 메시지 1번만 디버깅
-                        if (index === 0) {
-                          console.log('==== DEBUG CHAT ====');
-                          console.log('raw keys:', Object.keys(raw));
-                          console.log('raw:', raw);
-                          console.log('normalized:', message);
-                          console.log('myIds:', Array.from(myIds));
-                          console.log('from:', fromId, 'to:', toId, 'isMine:', isMine);
-                          console.log('====================');
-                        }
-
-                        return (
-                          <div key={`${(message.time) ?? 't'}-${index}`} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`flex items-end gap-2 max-w-[85%] ${isMine ? 'flex-row-reverse' : ''}`}>
-                              <img
-                                src={isMine ? resolveImg(user.profileImage) : resolveImg(selectedUser.path)}
-                                className="rounded-full h-9 w-9 object-cover flex-none"
-                                alt=""
-                              />
-
-                              <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                                {/* 디버그용 from 표시 */}
-                                {/* <div className="text-[10px] text-white-dark mb-1"> */}
-                                  {/* from:{String(fromId)} / me:{String(user.nameId ?? '')} */}
-                                {/* </div> */}
-
-                                <div
-                                  className={`px-4 py-2 rounded-2xl text-sm break-words ${
-                                    isMine ? 'bg-black/10 dark:bg-gray-800 rounded-br-md' : '!bg-primary text-white rounded-bl-md'
-                                  }`}
-                                >
-                                  {message.text}
-                                </div>
-
-                                <div className="mt-1 text-[11px] text-white-dark">
-                                  <div>{formatChatTime(message.time)}</div>
-                                  {/* <div>{formatKSTDate(message.time)}</div> */}
-                                </div>
-
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="text-center text-gray-400 py-10">대화가 없습니다.</div>
-                    )}
-                  </PerfectScrollbar>
-                </div>
-
-                {/* input */}
-                <div className="p-4 flex-none border-t border-white-light dark:border-[#1b2e4b]">
-                  <div className="flex items-center gap-3">
-                    <button type="button" className="hover:text-primary flex-none">
-                      <IconMoodSmile />
-                    </button>
-
-                    <input
-                      className="form-input rounded-full border-0 bg-[#f4f4f4] dark:bg-[#1b2e4b] px-4 py-2 flex-1"
-                      placeholder="메세지를 입력하세요"
-                      value={textMessage}
-                      onChange={(e) => setTextMessage(e.target.value)}
-                      onKeyDown={sendMessageHandle}
-                    />
-
-                    <button type="button" className="hover:text-primary flex-none" onClick={sendMessage}>
-                      <IconSend />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : null}
+            <div className="mx-3 min-w-0">
+              <p className="font-semibold truncate">{selectedUser.name}</p>
+              <p className="text-white-dark text-xs truncate">
+                {selectedUser.active ? 'Active now' : `마지막 접속: ${formatDateTime(selectedUser.time)}`}
+              </p>
+            </div>
           </div>
-        )}
+
+          <div className="flex sm:gap-5 gap-3 flex-none">
+            <button type="button">
+              <IconPhoneCall className="hover:text-primary" />
+            </button>
+            <button type="button">
+              <IconVideo className="w-5 h-5 hover:text-primary" />
+            </button>
+
+            <div className="dropdown">
+              <Dropdown
+                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
+                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center"
+                button={<IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />}
+              >
+                <ul className="text-black dark:text-white-dark">
+                  <li><button type="button"><IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />검색</button></li>
+                  <li><button type="button"><IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />복사</button></li>
+                  <li><button type="button"><IconTrashLines className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />삭제</button></li>
+                  <li><button type="button"><IconShare className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />동기화</button></li>
+                  <li><button type="button"><IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />프로필 편집</button></li>
+                </ul>
+              </Dropdown>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b] flex-none" />
+
+        {/* ✅ conversation (scroll) */}
+        <div className="flex-1 min-h-0">
+          <PerfectScrollbar className="chat-conversation-box h-full">
+      
+      {selectedUser.messages?.length ? (
+  selectedUser.messages.map((message: any, index: number) => {
+    const nameId = String(user.nameId ?? '');
+    const myId = String(user.id ?? '');
+
+    // 서버가 어떤 키로 주든 다 잡기
+    const from = String(message.fromUserId);
+    const to = String(message.toUserId);
+    console.log('message.fromUserId:', message.fromUserId);
+    console.log('message.toUserId:', message.toUserId);   
+
+
+    //const isMine = from === myNameId || from === myId;
+
+    const isMine = !message.fromUserId || myIds.has(String(message.fromUserId));
+
+
+
+    // ✅ 1번만 강제 로그 (너무 많이 찍히면 브라우저 터짐)
+    if (index === 0) {
+      console.log('==== DEBUG CHAT ====');
+      console.log('nameId:', nameId);
+      console.log('myId:', myId);
+      console.log('selectedUser.userId:', String(selectedUser.userId));
+      console.log('message sample:', message);
+      console.log('from:', from, 'to:', to, 'isMine:', isMine);
+      console.log('====================');
+    }
+
+    return (
+      <div key={`${message.time ?? message.created_at ?? index}-${index}`} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+        <div className={`flex items-end gap-2 max-w-[85%] ${isMine ? 'flex-row-reverse' : ''}`}>
+          <img
+            src={isMine ? resolveImg(user.profileImage) : resolveImg(selectedUser.path)}
+            className="rounded-full h-9 w-9 object-cover flex-none"
+            alt=""
+          />
+
+          <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+            {/* ✅ 화면에 from/to도 같이 표시(임시) */}
+            <div className="text-[10px] text-white-dark mb-1">
+              from:{from} / my:{nameId}
+            </div>
+
+            <div
+              className={`px-4 py-2 rounded-2xl text-sm break-words ${
+                isMine ? 'bg-black/10 dark:bg-gray-800 rounded-br-md' : '!bg-primary text-white rounded-bl-md'
+              }`}
+            >
+              {message.text}
+            </div>
+
+            <div className="mt-1 text-[11px] text-white-dark">
+              {String(message.time ?? message.created_at ?? '')}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  })
+) : (
+  <div className="text-center text-gray-400 py-10">대화가 없습니다.</div>
+)}
+
+          </PerfectScrollbar>
+        </div>                    
+
+        {/* ✅ input (bottom, absolute 제거) */}
+        <div className="p-4 flex-none border-t border-white-light dark:border-[#1b2e4b]">
+          <div className="flex items-center gap-3">
+            <button type="button" className="hover:text-primary flex-none">
+              <IconMoodSmile />
+            </button>
+
+            <input
+              className="form-input rounded-full border-0 bg-[#f4f4f4] dark:bg-[#1b2e4b] px-4 py-2 flex-1"
+              placeholder="메세지를 입력하세요"
+              value={textMessage}
+              onChange={(e) => setTextMessage(e.target.value)}
+              onKeyDown={sendMessageHandle}
+            />
+
+            <button type="button" className="hover:text-primary flex-none" onClick={sendMessage}>
+              <IconSend />
+            </button>
+          </div>
+        </div>
+      </div>
+    ) : null}
+  </div>
+)}
+
 
         {/* 아이디 추가 모달 */}
         <Transition appear show={isAddIdOpen} as={Fragment}>

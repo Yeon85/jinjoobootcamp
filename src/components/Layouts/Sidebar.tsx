@@ -107,14 +107,7 @@ const Sidebar = () => {
                                     </NavLink>
                                 </li>
 
-                                <li className="nav-item">
-                                    <NavLink to="/apps/chat_1" className="group">
-                                        <div className="flex items-center">
-                                            <IconMenuTodo className="group-hover:!text-primary shrink-0" />
-                                            <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('chat_1')}</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
+                              
 
 
                                 <li className="nav-item">
@@ -202,7 +195,7 @@ const Sidebar = () => {
                             </li>
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
-                                <span>{t('지아캠프')}</span>
+                                <span>{t('지아캠프3')}</span>
                             </h2>
 
                             <li className="nav-item">

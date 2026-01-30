@@ -427,10 +427,11 @@ const Index = () => {
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
                     <span>Sales</span>
                 </li>
-                 <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
+               
+                 {/* <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
                         <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                         로그아웃
-                      </button>
+                      </button> */}
             </ul>
 
             <div className="pt-5">

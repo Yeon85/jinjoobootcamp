@@ -7,6 +7,7 @@ import Dropdown from '../../components/Dropdown';
 import i18next from 'i18next';
 import IconCaretDown from '../../components/Icon/IconCaretDown';
 import IconMail from '../../components/Icon/IconMail';
+import IconLogin from '../../components/Icon/IconLogin';
 import IconLockDots from '../../components/Icon/IconLockDots';
 import IconInstagram from '../../components/Icon/IconInstagram';
 import IconFacebookCircle from '../../components/Icon/IconFacebookCircle';
@@ -165,7 +166,7 @@ const LoginBoxed = () => {
                                             className="form-input ps-10 placeholder:text-white-dark"
                                         />
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                            <IconMail fill={true} />
+                                            <IconLogin fill={true} />
                                         </span>
                                     </div>
                                 </div>

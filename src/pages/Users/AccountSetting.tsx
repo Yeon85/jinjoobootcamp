@@ -6,9 +6,13 @@ import { IRootState } from '../../store';
 import axios from 'axios';
 import { updateUser } from '@/store/userSlice';
 import ApplicationConfig from '../../application';
+//추가
+import IconBack from '../../components/Icon/IconBack';
+import { useNavigate } from 'react-router-dom';
+
 
 const AccountSetting = () => {
-
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((state: IRootState) => state.user);
 
@@ -125,7 +129,18 @@ const handleSave = async () => {
 
     return (
         <div className="p-6">
+         <button
+                      type="button"
+                      className="xl:hidden hover:text-primary flex-none"
+                      onClick={() => navigate('/apps/chat')}
+                    >
+                      <IconBack />
+                    </button>
             <div className="flex flex-col items-center">
+
+   
+
+
                 <img
                     src={previewImage || `${API_URL}${user.profileImage}` || '/assets/images/profile-34.jpeg'}
                     alt="Profile"
