@@ -17,6 +17,8 @@ const ApplicationConfig = {
     : 'https://bootcampbackend-production.up.railway.app',
 };
 
+console.log(`API_URL is set to: ${ApplicationConfig.API_URL}`);
+
 export default ApplicationConfig;
 
 
