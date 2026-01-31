@@ -50,7 +50,9 @@ type Contact = {
   contactId: number;
   userId: string;
   name: string;
-  nameId?: string;
+  nameId: string;
+  targetUserId: string;
+  targetUerName: string;
   path?: string;
   active: number | boolean;
   time: string;
@@ -194,6 +196,8 @@ const Chat = () => {
       contactId: Number(c.contactId ?? c.contact_id ?? 0),
       userId: String(c.userId ?? c.nameId ?? c.otherUserId ?? ''),
       name: String(c.name ?? ''),
+      targetUserId: String(c.targetUserId ?? ''),    
+      targetUerName: String(c.targetUserName ?? ''),      
       nameId: c.nameId ? String(c.nameId) : undefined,
       path: c.path,
       active: c.active ?? 0,
@@ -260,7 +264,7 @@ const Chat = () => {
 
   const delFriend = async (contactId: number) => {
     try {
-      await axios.delete(`${API_URL}/api/contacts/${user.id}`, {
+      await axios.delete(`${API_URL}/api/contacts/${user.nameId}`, {
         data: { contactId },
       });
       alert('친구삭제 완료!');
@@ -395,6 +399,7 @@ const Chat = () => {
     if (tab === 'chats' || tab === 'contacts' || tab === 'users') base = contactList;
     else base = [];
 
+    console.log("contactList:"+JSON.stringify(contactList));
     setFilteredItems(base.filter((d) => (d.name || '').toLowerCase().includes(keyword)));
   }, [searchUser, contactList, tab]);
 
@@ -592,11 +597,11 @@ const Chat = () => {
                 {tab === 'chats' &&
                   (filteredItems.length > 0 ? (
                     filteredItems.map((person: Contact) => (
-                      <div key={`${person.contactId}-${person.userId}`}>
+                      <div key={`${person.contactId}-${person.nameId}`}>
                         <button
                           type="button"
                           className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
-                            selectedUser && selectedUser.userId === person.userId
+                            selectedUser && selectedUser.nameId === person.nameId
                               ? 'bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary'
                               : ''
                           }`}
@@ -640,7 +645,7 @@ const Chat = () => {
                             <img src={resolveImg(c.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
                             <div className="ltr:text-left rtl:text-right">
                               <p className="font-semibold">{c.name}</p>
-                              <p className="text-xs text-white-dark">ID: {c.userId}</p>
+                              <p className="text-xs text-white-dark">ID: {c.targetUserId}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -668,13 +673,9 @@ const Chat = () => {
                             <img src={resolveImg(c.path)} className="rounded-full h-12 w-12 object-cover" alt="" />
                             <div className="ltr:text-left rtl:text-right">
                               <p className="font-semibold">{c.name}</p>
-                              <p className="text-xs text-white-dark">ID: {c.userId}</p>
+                              <p className="text-xs text-white-dark"> ID: {c.targetUserId}</p>
                             </div>
                           </div>
-
-                          <button type="button" className="btn btn-sm btn-outline-success" onClick={() => addFriend(c.userId)}>
-                            친구추가
-                          </button>
                         </div>
                       </div>
                     ))

@@ -39,7 +39,7 @@ const AccountSetting = () => {
     const API_URL = ApplicationConfig.API_URL;	
     const [formData, setFormData] = useState({
         id:user.id,
-        userId:'',
+        nameId:'',
         name: '',
         job_title: '',
         birthday: '',
@@ -82,8 +82,8 @@ const AccountSetting = () => {
         const form = new FormData();
 
         form.append('profile', selectedImage);
-        // 🔥 userId 추가
-        form.append('userId', String(user.id));  // user.id를 문자로 변환해서 같이 보내!
+        // 🔥 userId -> nameId 추가
+        form.append('nameId', String(user.nameId));  // user.id를 문자로 변환해서 같이 보내!
 
         try {
             const res = await axios.post(`${API_URL}/api/upload-profile`, form, {
@@ -137,10 +137,6 @@ const handleSave = async () => {
                       <IconBack />
                     </button>
             <div className="flex flex-col items-center">
-
-   
-
-
                 <img
                     src={previewImage || `${API_URL}${user.profileImage}` || '/assets/images/profile-34.jpeg'}
                     alt="Profile"
@@ -154,7 +150,7 @@ const handleSave = async () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                {['name', 'job_title', 'birthday', 'location', 'phone', 'email', 'twitter_url', 'dribbble_url', 'github_url'].map((field) => (
+                {['비밀번호','이름', 'job_title', 'birthday', 'location', 'phone', 'email', 'twitter_url', 'dribbble_url', 'github_url'].map((field) => (
                     <div key={field}>
                         <label htmlFor={field} className="block text-sm font-medium text-gray-700">
                             {field.replace('_', ' ').toUpperCase()}

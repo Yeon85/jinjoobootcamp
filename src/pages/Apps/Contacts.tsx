@@ -16,6 +16,7 @@ import IconX from '../../components/Icon/IconX';
 import ApplicationConfig from '../../application';
 import axios from 'axios';
 import { IRootState } from '../../store';
+import { t } from 'i18next';
 
 type ContactsProps = {
     embedded?: boolean; // ✅ Chat 안에서 렌더링할 때 true
@@ -35,8 +36,10 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
         contactId: null,
-        targetUserId: '',
         name: '',
+        nameId:'',
+        targetUserId: '',
+        targetUserName: '',
         path: 'user-profile.png',
     });
 
@@ -60,9 +63,9 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
     };
 
     const fetchContacts = async () => {
-        if (!user.id) return;
+        if (!user.nameId) return;
         try {
-            const response = await axios.get(`${API_URL}/api/contacts/${user.id}`);
+            const response = await axios.get(`${API_URL}/api/contacts/${user.nameId}`);
             const contacts = response.data?.contacts || [];
             setContactList(contacts);
             setFilteredItems(contacts);
@@ -117,7 +120,7 @@ const Contacts = ({ embedded = false }: ContactsProps) => {
         try {
             await axios.post(`${API_URL}/api/contacts`, {
                 myUserId: user.id,
-                targetUserId: Number(params.targetUserId),
+                targetUserId: params.targetUserId,
                 name: params.name,
                 path: 'user-profile.png',
             });

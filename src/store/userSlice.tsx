@@ -2,9 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
   id: number | null;
+  name: string;
+  password:string;
   nameId: string;
   fromId:string;
-  name: string;
   email: string;
   profileImage: string;
   extraCompleted: boolean;
@@ -22,14 +23,13 @@ interface UserState {
 const initialState: UserState = {
   id: null,
   name: '',
+  password:'',
   nameId: '',
   fromId:'',
   email: '',
   profileImage: '',
   extraCompleted: false,
   isLoggedIn: false,
-
-  // 추가 필드 초기값
   job_title: '',
   birthday: '',
   location: '',

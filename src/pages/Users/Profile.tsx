@@ -26,6 +26,7 @@ import ApplicationConfig from '../../application';
 //추가
 import IconBack from '../../components/Icon/IconBack';
 import { useNavigate } from 'react-router-dom';
+import { PassThrough } from 'stream';
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const Profile = () => {
     const [formData, setFormData] = useState({
         id:user.id,
         userId:user.id,
+        password:user.password,
         profileImage: user.profileImage,
         name: user.name,
         job_title: '',
@@ -109,6 +111,10 @@ const Profile = () => {
                                 <p className="font-semibold text-primary text-xl">{formData.name}</p>
                             </div>
                             <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
+                                <li className="flex items-center gap-2">
+                                    <IconCoffee className="shrink-0" />
+                                    {formData.password}
+                                </li>
                                 <li className="flex items-center gap-2">
                                     <IconCoffee className="shrink-0" />
                                     {formData.job_title}
