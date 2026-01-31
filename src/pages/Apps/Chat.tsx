@@ -32,7 +32,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Dialog, Transition } from '@headlessui/react';
 
-//추가
+// 추가
 import { logoutUser } from '@/store/userSlice';
 import IconLogout from '../../components/Icon/IconLogout';
 
@@ -43,12 +43,12 @@ type Message = {
   fromUserId: string;
   toUserId: string;
   text: string;
-  time: string;
+  time: string; // created_at 등
 };
 
 type Contact = {
   contactId: number;
-  userId: string; // 상대 아이디(nameId)
+  userId: string;
   name: string;
   nameId?: string;
   path?: string;
@@ -69,7 +69,6 @@ const Chat = () => {
   const socketRef = useRef<Socket | null>(null);
 
   const [tab, setTab] = useState<Tab>('chats');
-
   const [contactList, setContactList] = useState<Contact[]>([]);
   const [filteredItems, setFilteredItems] = useState<Contact[]>([]);
   const [searchUser, setSearchUser] = useState('');
@@ -77,8 +76,8 @@ const Chat = () => {
   const [isShowUserChat, setIsShowUserChat] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Contact | null>(null);
 
-  const [isShowChatMenu, setIsShowChatMenu] = useState(false);
   const [textMessage, setTextMessage] = useState('');
+  const [isShowChatMenu, setIsShowChatMenu] = useState(false);
 
   const [isAddIdOpen, setIsAddIdOpen] = useState(false);
   const [targetId, setTargetId] = useState('');
@@ -92,42 +91,72 @@ const Chat = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  /* ===========================
+     ✅ iOS/Safari 안전한 날짜 파싱
+     =========================== */
+  const parseMysqlKST = (s?: string) => {
+    if (!s) return null;
+
+    // ISO(예: 2026-01-30T00:12:58.000Z, 2026-01-30T09:12:58+09:00)
+    if (s.includes('T')) {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // MySQL "YYYY-MM-DD HH:mm:ss" → KST(+09:00) 강제
+    const d = new Date(s.replace(' ', 'T') + '+09:00');
+    return isNaN(d.getTime()) ? null : d;
+  };
+
   const formatDateTime = (timeString: string) => {
-    if (!timeString) return '';
-    const date = new Date(timeString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const d = parseMysqlKST(timeString);
+    if (!d) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
-  const formatChatTime = (iso?: string) => {
-  if (!iso) return '';
+  const formatChatTime = (s?: string) => {
+    const d = parseMysqlKST(s);
+    if (!d) return '';
 
-  const date = new Date(iso);
-  const now = new Date();
+    const now = new Date();
+    const isToday =
+      d.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' }) ===
+      now.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
 
-  const isToday =
-    date.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' }) ===
-    now.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+    if (isToday) {
+      return d.toLocaleTimeString('ko-KR', {
+        timeZone: 'Asia/Seoul',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
 
-  if (isToday) {
-    return date.toLocaleTimeString('ko-KR', {
+    return d.toLocaleDateString('ko-KR', {
       timeZone: 'Asia/Seoul',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  };
+
+  const formatKST = (s?: string) => {
+    const d = parseMysqlKST(s);
+    if (!d) return '';
+    return d.toLocaleString('ko-KR', {
+      timeZone: 'Asia/Seoul',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     });
-  }
-
-  return date.toLocaleDateString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
+  };
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -136,32 +165,6 @@ const Chat = () => {
     }, 50);
   };
 
-
-const parseMysqlKST = (s?: string) => {
-  if (!s) return null;
-
-  // 이미 ISO(예: 2026-01-30T00:12:58.000Z, 2026-01-30T09:12:58+09:00)면 그대로
-  if (s.includes('T')) return new Date(s);
-
-  // MySQL "YYYY-MM-DD HH:mm:ss" 를 KST(+09:00)로 확정해서 파싱
-  return new Date(s.replace(' ', 'T') + '+09:00');
-};
-
-const formatKST = (s?: string) => {
-  const d = parseMysqlKST(s);
-  if (!d) return '';
-  return new Date(d).toLocaleString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-};
-
-
   const resolveImg = (p?: string) => {
     if (!p) return `/assets/images/profile-35.png`;
     if (p.startsWith('/uploads')) return `${API_URL}${p}`;
@@ -169,7 +172,7 @@ const formatKST = (s?: string) => {
     return `/assets/images/${p}`;
   };
 
-  // ✅ 핵심: snake_case / camelCase 어떤 메시지가 와도 통일
+  // ✅ snake_case / camelCase 어떤 메시지가 와도 통일
   const normalizeMessage = (m: any): Message => {
     return {
       contactId: Number(m.contactId ?? m.contact_id ?? 0),
@@ -184,22 +187,25 @@ const formatKST = (s?: string) => {
     const msgsRaw = Array.isArray(c.messages) ? c.messages : [];
     const msgs = msgsRaw.map(normalizeMessage);
 
+    const lastMsg = msgs.length ? msgs[msgs.length - 1] : null;
+
     return {
       ...c,
       contactId: Number(c.contactId ?? c.contact_id ?? 0),
-      userId: String(c.userId ?? c.nameId ?? ''),
+      userId: String(c.userId ?? c.nameId ?? c.otherUserId ?? ''),
       name: String(c.name ?? ''),
       nameId: c.nameId ? String(c.nameId) : undefined,
       path: c.path,
       active: c.active ?? 0,
-      time: String(c.time ?? ''),
-      preview: c.preview ?? msgs[msgs.length - 1]?.text ?? '',
+      time: String(c.time ?? c.lastSeenTime ?? lastMsg?.time ?? ''),
+      preview: c.preview ?? c.lastPreview ?? lastMsg?.text ?? '',
       messages: msgs,
     };
   };
 
   const fetchRooms = async () => {
     if (!user?.nameId) return;
+
     try {
       const res = await axios.get(`${API_URL}/api/contacts/${user.nameId}`);
       const contacts: any[] = res.data?.contacts;
@@ -327,60 +333,52 @@ const formatKST = (s?: string) => {
     if (!socket) return;
 
     const onNewMessage = (raw: any) => {
-  let msg = normalizeMessage(raw);
+      let msg = normalizeMessage(raw);
 
-  const myNameId = String(user.nameId ?? '');
+      const myNameId = String(user.nameId ?? '');
 
-  // ✅ 1) fromUserId 보정
-  if (!msg.fromUserId) {
-    // raw에 있으면 우선 사용
-    if (raw.fromUserId) {
-      msg.fromUserId = String(raw.fromUserId);
-    } else {
-      // 없으면 "나"가 보낸 걸로 간주
-      msg.fromUserId = myNameId;
-    }
-  }
+      // ✅ 1) fromUserId 보정
+      if (!msg.fromUserId) {
+        if (raw.fromUserId) msg.fromUserId = String(raw.fromUserId);
+        else msg.fromUserId = myNameId;
+      }
 
-  // ✅ 2) toUserId 보정
-  if (!msg.toUserId) {
-    if (raw.toUserId) {
-      msg.toUserId = String(raw.toUserId);
-    } else if (selectedUser && selectedUser.contactId === msg.contactId) {
-      // 현재 열린 방이면 상대는 무조건 selectedUser
-      msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
-    }
-  }
+      // ✅ 2) toUserId 보정
+      if (!msg.toUserId) {
+        if (raw.toUserId) {
+          msg.toUserId = String(raw.toUserId);
+        } else if (selectedUser && selectedUser.contactId === msg.contactId) {
+          msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
+        }
+      }
 
-  // ✅ 3) 최종 안전장치 (둘 중 하나라도 없으면 반대편으로 채움)
-  if (!msg.toUserId && msg.fromUserId === myNameId && selectedUser) {
-    msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
-  }
+      // ✅ 3) 최종 안전장치
+      if (!msg.toUserId && msg.fromUserId === myNameId && selectedUser) {
+        msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
+      }
 
-  // 🔍 디버그 (문제 해결될 때까지만)
-  console.log('>>> newMessage FINAL', {
-    from: msg.fromUserId,
-    to: msg.toUserId,
-    text: msg.text,
-    time: msg.time,
-  });
+      console.log('>>> newMessage FINAL', {
+        from: msg.fromUserId,
+        to: msg.toUserId,
+        text: msg.text,
+        time: msg.time,
+      });
 
-  // === 상태 반영 ===
-  setContactList((prev) =>
-    prev.map((c) =>
-      c.contactId === msg.contactId
-        ? { ...c, messages: [...(c.messages || []), msg], preview: msg.text, time: msg.time }
-        : c
-    )
-  );
+      // === 상태 반영 ===
+      setContactList((prev) =>
+        prev.map((c) =>
+          c.contactId === msg.contactId
+            ? { ...c, messages: [...(c.messages || []), msg], preview: msg.text, time: msg.time }
+            : c
+        )
+      );
 
-  setSelectedUser((prev) => {
-    if (!prev) return prev;
-    if (prev.contactId !== msg.contactId) return prev;
-    return { ...prev, messages: [...(prev.messages || []), msg], preview: msg.text, time: msg.time };
-  });
-};
-
+      setSelectedUser((prev) => {
+        if (!prev) return prev;
+        if (prev.contactId !== msg.contactId) return prev;
+        return { ...prev, messages: [...(prev.messages || []), msg], preview: msg.text, time: msg.time };
+      });
+    };
 
     socket.on('newMessage', onNewMessage);
     return () => {
@@ -412,7 +410,7 @@ const formatKST = (s?: string) => {
     scrollToBottom();
   };
 
-  // ✅ 메시지 전송 (완성본)
+  // ✅ 메시지 전송
   const sendMessage = async () => {
     if (!textMessage.trim() || !selectedUser) return;
 
@@ -420,8 +418,8 @@ const formatKST = (s?: string) => {
 
     const payload = {
       contactId: selectedUser.contactId,
-      fromUserId: String(user.nameId ?? ''), // ✅ 내 nameId
-      toUserId: to, // ✅ 상대 nameId
+      fromUserId: String(user.nameId ?? ''),
+      toUserId: to,
       text: textMessage.trim(),
     };
 
@@ -444,47 +442,19 @@ const formatKST = (s?: string) => {
     }
   };
 
-
-  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-
-const isDifferentDay = (prev?: string, curr?: string) => {
-  if (!prev || !curr) return true;
-  return new Date(prev).toDateString() !== new Date(curr).toDateString();
-};
-
-// ✅ 날짜 구분선: 오늘/어제/그 외 날짜
-const formatDateDivider = (iso: string) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-
-  const today = startOfDay(new Date());
-  const msgDay = startOfDay(d);
-
-  const diffDays = Math.round((today.getTime() - msgDay.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return '오늘';
-  if (diffDays === 1) return '어제';
-
-  return d.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
-
-
-
-  
   // ✅ RIGHT 패널 숨김 조건
   const hideRightPanel = tab === 'contacts' || (!isShowUserChat && !isDesktopXL);
 
   // ✅ 내 아이디 후보 (nameId + id 둘 다 인정)
-  const myIds = new Set([String(user.nameId), String(user.id)]);
+  const myIds = new Set([String(user.nameId ?? ''), String(user.id ?? '')]);
 
   return (
     <div>
-      <div className={`relative flex items-stretch gap-5 h-[calc(100vh_-_150px)] min-h-[calc(100vh_-_150px)] ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
+      <div
+        className={`relative flex items-stretch gap-5 h-[calc(100vh_-_150px)] min-h-[calc(100vh_-_150px)] ${
+          isShowChatMenu ? 'min-h-[999px]' : ''
+        }`}
+      >
         {/* LEFT */}
         <div
           className={`panel p-0 flex flex-col flex-none max-w-xs w-full absolute top-0 xl:relative z-10 overflow-hidden h-full min-h-0
@@ -496,7 +466,11 @@ const formatDateDivider = (iso: string) => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className="flex-none">
-                  <img src={resolveImg(user.profileImage)} alt="img" className="w-24 h-24 rounded-full object-cover mb-5" />
+                  <img
+                    src={resolveImg(user.profileImage)}
+                    alt="img"
+                    className="w-24 h-24 rounded-full object-cover mb-5"
+                  />
                 </div>
                 <div className="mx-3">
                   <p className="mb-1 font-semibold">{user.nameId}</p>
@@ -526,7 +500,11 @@ const formatDateDivider = (iso: string) => {
                       </button>
                     </li>
                     <li>
-                      <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-danger !py-3 w-full flex items-center px-4"
+                      >
                         <IconLogout className="text-danger w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                         로그아웃
                       </button>
@@ -618,7 +596,9 @@ const formatDateDivider = (iso: string) => {
                         <button
                           type="button"
                           className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
-                            selectedUser && selectedUser.userId === person.userId ? 'bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary' : ''
+                            selectedUser && selectedUser.userId === person.userId
+                              ? 'bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary'
+                              : ''
                           }`}
                           onClick={() => selectUser(person)}
                         >
@@ -634,7 +614,9 @@ const formatDateDivider = (iso: string) => {
                               </div>
                               <div className="mx-3 ltr:text-left rtl:text-right">
                                 <p className="mb-1 font-semibold">{person.name}</p>
-                                <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview || person.messages?.[person.messages.length - 1]?.text || ''}</p>
+                                <p className="text-xs text-white-dark truncate max-w-[185px]">
+                                  {person.preview || person.messages?.[person.messages.length - 1]?.text || ''}
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -707,14 +689,21 @@ const formatDateDivider = (iso: string) => {
         </div>
 
         {/* overlay */}
-        <div className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`} onClick={() => setIsShowChatMenu(false)} />
+        <div
+          className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`}
+          onClick={() => setIsShowChatMenu(false)}
+        />
 
         {/* RIGHT */}
         {!hideRightPanel && (
           <div className="panel p-0 flex-1 min-w-0">
             {!isShowUserChat && (
               <div className="flex items-center justify-center h-full relative p-4">
-                <button type="button" onClick={() => setIsShowChatMenu(!isShowChatMenu)} className="xl:hidden absolute top-4 ltr:left-4 rtl:right-4 hover:text-primary">
+                <button
+                  type="button"
+                  onClick={() => setIsShowChatMenu(!isShowChatMenu)}
+                  className="xl:hidden absolute top-4 ltr:left-4 rtl:right-4 hover:text-primary"
+                >
                   <IconBack />
                 </button>
 
@@ -754,7 +743,9 @@ const formatDateDivider = (iso: string) => {
 
                     <div className="mx-3 min-w-0">
                       <p className="font-semibold truncate">{selectedUser.name}</p>
-                      <p className="text-white-dark text-xs truncate">{selectedUser.active ? 'Active now' : `마지막 접속: ${formatDateTime(selectedUser.time)}`}</p>
+                      <p className="text-white-dark text-xs truncate">
+                        {selectedUser.active ? 'Active now' : `마지막 접속: ${formatDateTime(selectedUser.time)}`}
+                      </p>
                     </div>
                   </div>
 
@@ -798,7 +789,7 @@ const formatDateDivider = (iso: string) => {
                             </button>
                           </li>
                           <li>
-                            <button type="button" onClick={handleProfile} > 
+                            <button type="button" onClick={handleProfile}>
                               <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
                               프로필
                             </button>
@@ -818,14 +809,11 @@ const formatDateDivider = (iso: string) => {
                       selectedUser.messages.map((raw: any, index: number) => {
                         const message = normalizeMessage(raw);
 
-                        console.log('>>>> raw message:', raw);
-  console.log('📨 socket raw time:', raw.time, raw.created_at);
-  console.log('📨 socket raw time:', raw.time, raw.createdAt);
                         const fromId = String(message.fromUserId ?? '');
                         const toId = String(message.toUserId ?? '');
                         const isMine = myIds.has(fromId);
 
-                        // ✅ 첫 메시지 1번만 디버깅
+                        // 첫 메시지 1번만 디버깅
                         if (index === 0) {
                           console.log('==== DEBUG CHAT ====');
                           console.log('raw keys:', Object.keys(raw));
@@ -833,11 +821,12 @@ const formatDateDivider = (iso: string) => {
                           console.log('normalized:', message);
                           console.log('myIds:', Array.from(myIds));
                           console.log('from:', fromId, 'to:', toId, 'isMine:', isMine);
+                          console.log('time raw:', message.time, 'parsed:', parseMysqlKST(message.time));
                           console.log('====================');
                         }
 
                         return (
-                          <div key={`${(message.time) ?? 't'}-${index}`} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                          <div key={`${message.time || 't'}-${index}`} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                             <div className={`flex items-end gap-2 max-w-[85%] ${isMine ? 'flex-row-reverse' : ''}`}>
                               <img
                                 src={isMine ? resolveImg(user.profileImage) : resolveImg(selectedUser.path)}
@@ -846,11 +835,6 @@ const formatDateDivider = (iso: string) => {
                               />
 
                               <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                                {/* 디버그용 from 표시 */}
-                                {/* <div className="text-[10px] text-white-dark mb-1"> */}
-                                  {/* from:{String(fromId)} / me:{String(user.nameId ?? '')} */}
-                                {/* </div> */}
-
                                 <div
                                   className={`px-4 py-2 rounded-2xl text-sm break-words ${
                                     isMine ? 'bg-black/10 dark:bg-gray-800 rounded-br-md' : '!bg-primary text-white rounded-bl-md'
@@ -861,9 +845,8 @@ const formatDateDivider = (iso: string) => {
 
                                 <div className="mt-1 text-[11px] text-white-dark">
                                   <div>{formatChatTime(message.time)}</div>
-                                  {/* <div>{formatKSTDate(message.time)}</div> */}
+                                  {/* <div>{formatKST(message.time)}</div> */}
                                 </div>
-
                               </div>
                             </div>
                           </div>
@@ -903,7 +886,15 @@ const formatDateDivider = (iso: string) => {
         {/* 아이디 추가 모달 */}
         <Transition appear show={isAddIdOpen} as={Fragment}>
           <Dialog as="div" className="relative z-[999]" onClose={closeAddIdModal}>
-            <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100" leaveTo="opacity-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
               <div className="fixed inset-0 bg-black/60" />
             </Transition.Child>
 

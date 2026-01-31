@@ -17,6 +17,7 @@ import { loginUser } from '../../store/userSlice';
 
 import axios from 'axios'; // 위에 추가
 import ApplicationConfig from '../../application';
+import { co } from '@fullcalendar/core/internal-common';
 
 const LoginBoxed = () => {
     const [email, setEmail] = useState('');
@@ -57,8 +58,10 @@ const LoginBoxed = () => {
                 password,
             });
     
-            alert(response.data.message); // 로그인 성공 메시지
+           // alert(response.data.message); // 로그인 성공! 환영합니다
     
+            alert("로그인 성공! 환영합니다, " + response.data.user.name + "님.");           
+            console.log('로그인 사용자 정보:', response.data.user);   
             // ✅ Redux에 저장
             dispatch(loginUser(response.data.user));
     
@@ -66,6 +69,7 @@ const LoginBoxed = () => {
             localStorage.setItem('user', JSON.stringify({
                 id:response.data.user.id,
                 name: response.data.user.name,
+                nameId: response.data.user.nameId,
                 email: response.data.user.email,
                 profileImage: response.data.user.profileImage,  // 혹시 없으면 profileImage는 생략해도 됨
                 role_code:response.data.user.role_code,

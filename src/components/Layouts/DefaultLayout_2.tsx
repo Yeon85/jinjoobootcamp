@@ -85,9 +85,9 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
                     <div className="main-content flex flex-col min-h-screen">
                         {/* BEGIN TOP NAVBAR */}
-                        <div className="lg:block">
-                            <Header />
-                        </div>
+                      <div className="hidden lg:block">
+  <Header />
+</div>
                         {/* END TOP NAVBAR */}
 
                         {/* BEGIN CONTENT AREA */}
