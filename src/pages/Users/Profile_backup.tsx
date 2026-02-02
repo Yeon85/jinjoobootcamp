@@ -18,7 +18,7 @@ import IconTag from '../../components/Icon/IconTag';
 import IconCreditCard from '../../components/Icon/IconCreditCard';
 import IconClock from '../../components/Icon/IconClock';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
-import { loginUser } from '@/store/userSlice';
+import { loginUser } from '../../store/userSlice';
 import axios from 'axios';
 import { useState,useEffect } from 'react';
 import ApplicationConfig from '../../application';

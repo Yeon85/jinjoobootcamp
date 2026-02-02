@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { IRootState } from '../../store';
 import axios from 'axios';
-import { updateUser } from '@/store/userSlice';
+import { updateUser } from '../../store/userSlice';
 import ApplicationConfig from '../../application';
 //추가
 import IconBack from '../../components/Icon/IconBack';

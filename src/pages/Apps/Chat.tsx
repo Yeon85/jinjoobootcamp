@@ -33,7 +33,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 // 추가
-import { logoutUser } from '@/store/userSlice';
+import { logoutUser } from '../../store/userSlice';
 import IconLogout from '../../components/Icon/IconLogout';
 
 type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';
@@ -243,6 +243,11 @@ const Chat = () => {
 
   const handleProfile = () => {
     navigate('/users/profile');
+  };
+
+  //ContactUsBoxed  /pages/contact-us-boxed',  
+  const handleContact = () => {
+    navigate('/pages/contact-us-boxed');
   };
 
   // ✅ 친구추가(상대 아이디 문자열)
@@ -499,9 +504,9 @@ const Chat = () => {
                       </button>
                     </li>
                     <li>
-                      <button type="button">
+                      <button type="button" onClick={handleContact}>
                         <IconHelpCircle className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                        Help & feedback
+                         문의하기
                       </button>
                     </li>
                     <li>
@@ -765,6 +770,7 @@ const Chat = () => {
                         button={<IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />}
                       >
                         <ul className="text-black dark:text-white-dark">
+                            {/* 
                           <li>
                             <button type="button">
                               <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
@@ -789,6 +795,7 @@ const Chat = () => {
                               동기화
                             </button>
                           </li>
+                              */}
                           <li>
                             <button type="button" onClick={handleProfile}>
                               <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
@@ -822,7 +829,7 @@ const Chat = () => {
                           console.log('normalized:', message);
                           console.log('myIds:', Array.from(myIds));
                           console.log('from:', fromId, 'to:', toId, 'isMine:', isMine);
-                          console.log('time raw:', message.time, 'parsed:', parseMysqlKST(message.time));
+                          console.log('time raw:', message.time, 'parsed:', formatDateTime(message.time));
                           console.log('====================');
                         }
 
@@ -845,7 +852,7 @@ const Chat = () => {
                                 </div>
 
                                 <div className="mt-1 text-[11px] text-white-dark">
-                                  <div>{formatChatTime(message.time)}</div>
+                                  <div>{formatDateTime(message.time)}</div>
                                   {/* <div>{formatKST(message.time)}</div> */}
                                 </div>
                               </div>

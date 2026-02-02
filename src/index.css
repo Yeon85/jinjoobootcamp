@@ -1,0 +1,19 @@
+/* 기본 리셋 + 보기 좋은 기본값 */
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, "Noto Sans KR", sans-serif;
+  background: #ffffff;
+  color: #0f172a;
+}

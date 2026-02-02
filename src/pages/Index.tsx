@@ -20,7 +20,7 @@ import IconCaretDown from '../components/Icon/IconCaretDown';
 import IconLogout from '../components/Icon/IconLogout';
 import IconPlus from '../components/Icon/IconPlus';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
-import { loginUser, logoutUser } from '@/store/userSlice';
+import { loginUser, logoutUser } from '../store/userSlice';
 import { useNavigate } from 'react-router-dom';  // 추가
 import { Link, NavLink, useLocation } from 'react-router-dom';
 

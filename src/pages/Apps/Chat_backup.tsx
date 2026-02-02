@@ -36,7 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 //추가
-import { logoutUser } from '@/store/userSlice';
+import { logoutUser } from '../../store/userSlice';
 import IconLogout from '../../components/Icon/IconLogout';
 
 type Tab = 'users' | 'chats' | 'contacts' | 'calls' | 'noti';

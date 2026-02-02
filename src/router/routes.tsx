@@ -103,7 +103,7 @@ const MarkDownEditor = lazy(() => import('../pages/Forms/MarkDownEditor'));
 const DateRangePicker = lazy(() => import('../pages/Forms/DateRangePicker'));
 const Clipboard = lazy(() => import('../pages/Forms/Clipboard'));
 
-const SurveyPage = lazy(() => import('@/pages/Survey/SurveyPage'));
+const SurveyPage = lazy(() => import('../pages/Survey/SurveyPage'));
 //const SurveyEditPage = lazy(() => import('@/pages/Survey/SurveyEditPage')); // ✅ 추가!!
 
 const routes = [

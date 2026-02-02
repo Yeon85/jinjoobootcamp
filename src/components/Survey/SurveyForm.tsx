@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
 import axios from 'axios';
-import { loginUser } from '@/store/userSlice';
+import { loginUser } from '../../store/userSlice';
 import { useNavigate } from 'react-router-dom'; 
 import ApplicationConfig from '../../application';
 

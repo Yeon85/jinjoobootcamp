@@ -34,7 +34,7 @@ import IconMenuPages from '../Icon/Menu/IconMenuPages';
 import IconMenuMore from '../Icon/Menu/IconMenuMore';
 //추가
 import { useNavigate } from 'react-router-dom';  // 추가
-import { loginUser, logoutUser } from '@/store/userSlice';
+import { loginUser, logoutUser } from '../../store/userSlice';
 import axios from 'axios';
 import ApplicationConfig from '../../application';
 

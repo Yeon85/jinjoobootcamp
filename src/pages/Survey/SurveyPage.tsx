@@ -1,4 +1,4 @@
-import SurveyForm from '@/components/Survey/SurveyForm'; // 경로는 프로젝트에 맞게 조정할 것
+import SurveyForm from '../../components/Survey/SurveyForm'; // 경로는 프로젝트에 맞게 조정할 것
 import { Helmet } from 'react-helmet-async'; // (선택) SEO를 위해 문서 타이틀 설정하려면
 
 const SurveyPage = () => {

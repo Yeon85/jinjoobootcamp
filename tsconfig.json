@@ -15,8 +15,7 @@
       "isolatedModules": true,
       "noEmit": true,
       "jsx": "react-jsx",
-      
-      "baseUrl": "./",                     // ✅ 추가
+      "baseUrl": ".",                     // ✅ 추가
       "paths": {                           // ✅ 추가
         "@/*": ["src/*"]
       }
