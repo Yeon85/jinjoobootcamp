@@ -366,7 +366,7 @@ const Chat = () => {
         msg.toUserId = String(selectedUser.userId ?? selectedUser.nameId ?? '');
       }
 
-      console.log('>>> newMessage FINAL', {
+      console.log(' >>> newMessage FINAL', {
         from: msg.fromUserId,
         to: msg.toUserId,
         text: msg.text,
