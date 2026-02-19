@@ -5,6 +5,7 @@ import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
 
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
+import IconAward from '../../components/Icon/IconAward';
 import IconCoffee from '../../components/Icon/IconCoffee';
 import IconCalendar from '../../components/Icon/IconCalendar';
 import IconMapPin from '../../components/Icon/IconMapPin';
@@ -35,6 +36,7 @@ const Profile = () => {
     const [formData, setFormData] = useState({
         id:user.id,
         userId:user.id,
+        nameId:user.nameId,
         password:user.password,
         profileImage: user.profileImage,
         name: user.name,
@@ -100,7 +102,7 @@ const Profile = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
                     <div className="panel">
                         <div className="flex items-center justify-between mb-5">
-                            <h5 className="font-semibold text-lg dark:text-white-light">Profile</h5>
+                            <h5 className="font-semibold text-lg dark:text-white-light">프로필</h5>
                             <Link to="/users/user-account-settings" className="ltr:ml-auto rtl:mr-auto btn btn-primary p-2 rounded-full">
                                 <IconPencilPaper />
                             </Link>
@@ -112,8 +114,8 @@ const Profile = () => {
                             </div>
                             <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
                                 <li className="flex items-center gap-2">
-                                    <IconCoffee className="shrink-0" />
-                                    {formData.password}
+                                    <IconAward className="shrink-0" />
+                                    {formData.nameId}
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconCoffee className="shrink-0" />

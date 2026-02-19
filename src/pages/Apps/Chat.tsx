@@ -245,6 +245,12 @@ const Chat = () => {
     navigate('/users/profile');
   };
 
+  const handleId = () => {
+    
+    alert("내 아이디는 [ "+ user.nameId+" ] 입니다."); //user.nameId
+    //navigate('/users/profile');
+  };
+
   //ContactUsBoxed  /pages/contact-us-boxed',  
   const handleContact = () => {
     navigate('/pages/contact-us-boxed');
@@ -498,6 +504,10 @@ const Chat = () => {
                 >
                   <ul className="whitespace-nowrap">
                     <li>
+                       <button type="button" onClick={handleId} className="w-full flex items-center px-4 !py-3">
+                        <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
+                        내아이디 확인하기
+                      </button>
                       <button type="button" onClick={handleProfile} className="w-full flex items-center px-4 !py-3">
                         <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
                         프로필 편집

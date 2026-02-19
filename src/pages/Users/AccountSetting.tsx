@@ -19,6 +19,7 @@ const AccountSetting = () => {
    // var id = user.id;
     const email = user.email;
     const name = user.name;
+    const name_id = user.nameId;
     const [tabs, setTabs] = useState<string>('home');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -26,6 +27,7 @@ const AccountSetting = () => {
 
 
     const [inputName, setInputName] = useState(user.name);
+    const [inputNameId, setInputNameId] = useState(user.nameId || '');
     const [inputJobTitle, setInputJobTitle] = useState(user.job_title || '');
     const [inputBirthday, setInputBirthday] = useState(user.birthday || '');
     const [inputLocation, setInputLocation] = useState(user.location || '');
@@ -50,6 +52,20 @@ const AccountSetting = () => {
         dribbble_url: '',
         github_url: '',
     });
+
+
+    const fieldLabels: Record<string, string> = {
+        nameId : '아이디',
+        name: '이름',
+        job_title: '직업',
+        birthday: '생년월일',
+        location: '거주지',
+        phone: '전화번호',
+        email: '이메일',
+        twitter_url: '트위터 url',
+        dribbble_url: '드리블 url',
+        github_url: '깃허브 url',
+        };
 
     useEffect(() => {
         if (user.id) {
@@ -150,10 +166,11 @@ const handleSave = async () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                {['비밀번호','이름', 'job_title', 'birthday', 'location', 'phone', 'email', 'twitter_url', 'dribbble_url', 'github_url'].map((field) => (
+                {['nameId', 'name','job_title', 'birthday', 'location', 'phone', 'email', 'twitter_url', 'dribbble_url', 'github_url'].map((field) => (
                     <div key={field}>
                         <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-                            {field.replace('_', ' ').toUpperCase()}
+                            {/* {field.replace('_', ' ').toUpperCase()} */}
+                            {fieldLabels[field]}
                         </label>
                         <input
                             id={field}

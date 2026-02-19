@@ -20,6 +20,7 @@ import IconArrowLeft from '../Icon/IconArrowLeft';
 import IconInfoCircle from '../Icon/IconInfoCircle';
 import IconBellBing from '../Icon/IconBellBing';
 import IconUser from '../Icon/IconUser';
+import IconAward from '../Icon/IconAward';
 import IconMail from '../Icon/IconMail';
 import IconLockDots from '../Icon/IconLockDots';
 import IconLogout from '../Icon/IconLogout';
@@ -100,6 +101,13 @@ const Header = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
+
+
+    const goMyId = (e?: React.MouseEvent) => {
+    e?.stopPropagation();      // ✅ 드롭다운 클릭 버블링 방지(필요시)
+    
+    alert("내 아이디는 [ "+ user.nameId+" ] 입니다."); //user.nameId
+    };
 
 
     function createMarkup(messages: any) {
@@ -480,25 +488,41 @@ const Header = () => {
                                 button={<img className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src={`${API_URL}${profileImage}`}  alt="userProfile" />}
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
+                                    
+                                    
+                                    
                                     <li>
                                         <div className="flex items-center px-4 py-4">
                                             <img className="rounded-md w-10 h-10 object-cover" src={`${API_URL}${profileImage}`}  alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">
-                                                {nameId} {name}
+                                                 {name}
                                                     <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
                                                 </h4>
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-                                                    {email}
+                                                    {nameId}
                                                 </button>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
+                                         <button
+                                            type="button"
+                                            onClick={goMyId}
+                                            className="w-full flex items-center px-4 py-2 dark:hover:text-white"
+                                        >
+                                            <IconAward className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
+                                            내아이디 확인하기
+                                        </button>
                                         <Link to="/users/profile" className="dark:hover:text-white">
                                             <IconUser className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            Profile
+                                            비밀번호 변경하기
                                         </Link>
+                                        <Link to="/users/profile" className="dark:hover:text-white">
+                                            <IconUser className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
+                                            프로필
+                                        </Link>
+
                                     </li>
                                     <li>
                                         <Link to="/apps/mailbox" className="dark:hover:text-white">
@@ -509,13 +533,13 @@ const Header = () => {
                                     <li>
                                         <Link to="/auth/boxed-lockscreen" className="dark:hover:text-white">
                                             <IconLockDots className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            Lock Screen
+                                            잠금
                                         </Link>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
                                         <button type="button" onClick={handleLogout} className="text-danger !py-3 w-full flex items-center px-4">
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
-                                            Sign Out
+                                            로그아웃
                                         </button>
                                     </li>
                                 </ul>

@@ -202,13 +202,13 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconAt className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            11<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconAward className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            12<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconBarChart className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           1 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconBell className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -223,7 +223,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconBookmark className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           2 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconBox className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -256,7 +256,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconChecks className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           3 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconChrome className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -289,7 +289,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconDesktop className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           4 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconDollarSign className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -310,7 +310,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconInfoCircle className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           5 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconEye className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -334,7 +334,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconGithub className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            6<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconGlobe className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -358,7 +358,7 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconInfoTriangle className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                           7 <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconInstagram className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
@@ -382,13 +382,13 @@ const FontIcons = () => {
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconLoader className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            76<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconLock className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            77<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconLockDots className="w-6 h-6" />
                             </div>
-                            <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
+                            8<div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
                                 <IconLogin className="w-6 h-6" />
                             </div>
                             <div className="grid place-content-center w-14 h-14 border border-white-dark/20 dark:border-[#191e3a] rounded-md">
